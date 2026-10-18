@@ -1,4 +1,4 @@
-Xee has an MCP server. Once Claude Code is connected to it, Claude can read your paywalls, change their design and values, push a new version to Xee, and look at test results, without you leaving the editor.
+Xee has an MCP server. Once Claude Code is connected to it, Claude can read your paywalls, change their design and values, push a new version to Xee, and look at test results, without you leaving the editor. Install the Xee skills as well, and Claude knows how to add the SDK to your app, test a purchase and run paywall tests too.
 
 ## 1. Make a token
 
@@ -31,6 +31,50 @@ claude mcp list
 ```
 
 Then ask Claude: *List my Xee apps.*
+
+## 4. Install the Xee skills
+
+The MCP gives Claude access to your Xee data. The **Xee skills** teach it how to use that access well: adding the SDK to your iOS app, getting a sandbox purchase through, changing and testing a paywall, and answering from these docs. Install them once and Claude picks the right one from what you ask. You never have to name a skill.
+
+| Skill | What it does |
+| --- | --- |
+| `xee-integration` | Adds the Xee SDK to your iOS app and wires activation, users, the paywall, purchases and subscription status |
+| `purchase-testing` | Gets your first sandbox purchase through, and finds where it broke when one does not unlock `premium` |
+| `paywall-tests` | Moves a paywall's values into Xee, pushes new versions safely, suggests tests and reads the results |
+| `xee-docs` | Answers a question about Xee from the right page of these docs |
+
+In Claude Code, run this in a terminal:
+
+```bash
+claude plugin marketplace add xee-ai/xee-skills
+claude plugin install xee-skills@xee
+```
+
+Then run `/reload-plugins` inside Claude Code, or restart it. Run `/plugin` and check that `xee-skills` is listed.
+
+For Codex:
+
+```bash
+codex plugin marketplace add xee-ai/xee-skills
+codex plugin add xee-skills@xee
+```
+
+Start a new thread afterwards, so Codex picks up the skills.
+
+For any other agent (Cursor, Copilot, Gemini CLI and more), use the [skills CLI](https://skills.sh):
+
+```bash
+npx skills add xee-ai/xee-skills --all
+```
+
+Skills installed this way do not update by themselves. Run `npx skills update` to get the latest.
+
+Try it: open your app's project in Claude and say *Integrate Xee into my app*.
+
+> [!NOTE]
+> Every skill except `xee-docs` reads and changes your Xee data through the MCP, so finish steps 1 to 3 first. The skills ask before they edit your project, create products, or push a paywall version, and they never start a test: you do that in the dashboard.
+
+To update the skills later in Claude Code, run `claude plugin marketplace update xee`, then `claude plugin update xee-skills@xee`. The source and the full list of install routes are at [github.com/xee-ai/xee-skills](https://github.com/xee-ai/xee-skills).
 
 ## What to ask Claude
 
