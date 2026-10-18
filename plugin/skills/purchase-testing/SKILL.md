@@ -104,9 +104,10 @@ naming what to confirm on each:
 | App settings, iOS SDK | SDK key, server URL, Notification URL, Bundle ID |
 
 With the MCP connected you do not need that table for the app's own values: `list_apps` and
-`get_app` return its `sdk_key`, `bundle_id`, `server_url` and `notification_url`. Use them for the
-code checks below (the key in the code must equal `sdk_key`; the project's bundle identifier must
-equal `bundle_id`), and give the user `notification_url` to paste. The SDK key is public, but quote
+`get_app` return its `sdk_key`, `bundle_id` and `server_url`. Use them for the code checks below
+(the key in the code must equal `sdk_key`; the project's bundle identifier must equal
+`bundle_id`). The notification URL is not among them: it is on App settings, iOS SDK in the
+dashboard, so the user copies it from there. The SDK key is public, but quote
 only its first characters in a reply: the whole value adds nothing to the answer.
 
 If you have several apps, match the app by name or bundle ID from the code; ask only if

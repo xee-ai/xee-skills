@@ -82,7 +82,7 @@ The `xee` MCP server. Real tools only:
 
 | Tool | Use it to |
 |---|---|
-| `list_apps`, `get_app` | Find the app's Xee ID (all stages that need an `app`), and read its setup values: `sdk_key`, `bundle_id`, `server_url`, `notification_url`. |
+| `list_apps`, `get_app` | Find the app's Xee ID (all stages that need an `app`), and read its setup values: `sdk_key`, `bundle_id`, `apple_app_id`, `server_url`. |
 | `list_docs`, `get_doc` | Read the docs, as above. |
 | `list_products`, `get_product` | See which products Xee has, and one product's status. |
 | `create_product` | Add a product to **Xee** (USD price, period, access `premium`). It does **not** create it in App Store Connect. |
@@ -248,8 +248,8 @@ Fetch `sandbox-testing`. Nothing unlocks until this is done, and it is all **Use
 App Store Connect and on a phone. Give them in this order, each with its exact path, and wait
 for a yes on each:
 
-1. **Notification URL.** It is the `notification_url` of the app in `list_apps` (and on App
-   settings, iOS SDK in the Xee dashboard). Give it to the user, who pastes it into
+1. **Notification URL.** The user copies it from App settings, iOS SDK in the Xee dashboard (the
+   MCP does not return it) and pastes it into
    App Store Connect (your app, App Information, App Store Server Notifications) for both
    Production and Sandbox, choose Version 2. The bundle ID in Xee must match the app.
 2. **Server reachable.** Apple must reach the server over HTTPS. A server on `127.0.0.1`
