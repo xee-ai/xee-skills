@@ -103,7 +103,11 @@ naming what to confirm on each:
 | Events | a `SUBSCRIBED` event with a Sandbox label (after the purchase) |
 | App settings, iOS SDK | SDK key, server URL, Notification URL, Bundle ID |
 
-Never print the SDK key in your reply; the user can copy it from App settings.
+With the MCP connected you do not need that table for the app's own values: `list_apps` and
+`get_app` return its `sdk_key`, `bundle_id`, `server_url` and `notification_url`. Use them for the
+code checks below (the key in the code must equal `sdk_key`; the project's bundle identifier must
+equal `bundle_id`), and give the user `notification_url` to paste. The SDK key is public, but quote
+only its first characters in a reply: the whole value adds nothing to the answer.
 
 If you have several apps, match the app by name or bundle ID from the code; ask only if
 it is still ambiguous.
@@ -150,7 +154,7 @@ Read the code; do not ask the user what it does. Search for and check:
 
 | Look for | A problem looks like |
 |---|---|
-| `Xee.activate(withAPIKey:)` or `XeeConfiguration.builder(withAPIKey:)` | key missing, a placeholder, or not the one in App settings, iOS SDK (compare only when you can see the dashboard value; otherwise ask the user to compare the first characters) |
+| `Xee.activate(withAPIKey:)` or `XeeConfiguration.builder(withAPIKey:)` | key missing, a placeholder such as `xee_YOUR_SDK_KEY`, or not the app's `sdk_key` from `list_apps` (without the MCP, ask the user to compare the first characters with App settings, iOS SDK) |
 | `.with(serverUrl:)` | absent (the SDK then talks to `http://localhost:7010`, which only works in the Simulator against a server running on the same Mac; on a device it fails), `http://`, or a local address |
 | `Xee.activate(withAPIKey:)` or `Xee.activate(with:)` | called more than once, or other SDK calls made before it finished |
 | `.with(observerMode: true)` | purchases through the SDK are then unavailable |
@@ -163,7 +167,7 @@ Read the code; do not ask the user what it does. Search for and check:
 | `Xee.identify(_:withAppAccountToken:)` | called after the purchase, or with a token that belongs to another profile |
 | `restorePurchases()` | missing; App Review expects it |
 | `*.storekit` file and the scheme (`StoreKitConfigurationFileReference` in the `.xcscheme`) | a configuration file selected means purchases never reach Apple |
-| `PRODUCT_BUNDLE_IDENTIFIER` in the project | must equal the Bundle ID in App settings, iOS SDK (the dashboard side is the user's check) |
+| `PRODUCT_BUNDLE_IDENTIFIER` in the project | must equal the Bundle ID in App settings, iOS SDK (compare with `bundle_id` from `list_apps`; without the MCP the dashboard side is the user's check) |
 
 A code problem you can name is yours to fix once the user agrees. If it means writing or
 changing integration code, offer it and hand to `xee-integration`.

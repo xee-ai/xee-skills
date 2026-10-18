@@ -82,7 +82,7 @@ The `xee` MCP server. Real tools only:
 
 | Tool | Use it to |
 |---|---|
-| `list_apps` | Find the app's Xee ID (all stages that need an `app`). |
+| `list_apps`, `get_app` | Find the app's Xee ID (all stages that need an `app`), and read its setup values: `sdk_key`, `bundle_id`, `server_url`, `notification_url`. |
 | `list_docs`, `get_doc` | Read the docs, as above. |
 | `list_products`, `get_product` | See which products Xee has, and one product's status. |
 | `create_product` | Add a product to **Xee** (USD price, period, access `premium`). It does **not** create it in App Store Connect. |
@@ -123,12 +123,17 @@ never both finish the same transaction twice.
 ## Stage 1: The app in Xee and the SDK (Both)
 
 **1a. The app exists in Xee (User).** Call `list_apps`. If the user's app is there, take its
-ID. If not, the user creates it in the Xee dashboard (the bundle ID must match the Xcode
-project exactly) and you call `list_apps` again. You cannot create the app.
+ID. Match it by its `bundle_id` against the Xcode project's bundle identifier, or by name when
+there is one app; ask only if it is still ambiguous. If it is not there, the user creates it in the
+Xee dashboard (the bundle ID must match the Xcode project exactly) and you call `list_apps` again.
+You cannot create the app. If `bundle_id` is null, the app has no bundle ID yet: the user sets it in
+App settings, iOS SDK.
 
-**1b. The SDK key and server URL (User).** Tell the user to open App settings, iOS SDK in
-the dashboard, and paste the "SDK key" (starts with `xee_`) and the "Server URL". The
-`get_doc` output for `install` also carries the server address. Without `.with(serverUrl:)`
+**1b. The SDK key and server URL (You).** The same `list_apps` entry (or `get_app`) carries the
+app's `sdk_key` (starts with `xee_`) and `server_url`. Use them: write the real `sdk_key` into the
+activation code, never the `xee_YOUR_SDK_KEY` placeholder from the docs. If `sdk_key` is null,
+say so and tell the user to open App settings, iOS SDK in the dashboard and paste it; do not leave a
+placeholder and say the work is done. Without `.with(serverUrl:)`
 the SDK talks to `http://localhost:7010`, the Xee server on the developer's Mac. That only
 works in the Simulator, with a server running on the same Mac. A device and a release build
 need `.with(serverUrl:)` set to the real HTTPS server.
@@ -243,7 +248,8 @@ Fetch `sandbox-testing`. Nothing unlocks until this is done, and it is all **Use
 App Store Connect and on a phone. Give them in this order, each with its exact path, and wait
 for a yes on each:
 
-1. **Notification URL.** From App settings, iOS SDK in the Xee dashboard, paste it into
+1. **Notification URL.** It is the `notification_url` of the app in `list_apps` (and on App
+   settings, iOS SDK in the Xee dashboard). Give it to the user, who pastes it into
    App Store Connect (your app, App Information, App Store Server Notifications) for both
    Production and Sandbox, choose Version 2. The bundle ID in Xee must match the app.
 2. **Server reachable.** Apple must reach the server over HTTPS. A server on `127.0.0.1`
@@ -267,8 +273,9 @@ sandbox account, tap restore.
 
 ## Never
 
-- Never hardcode a customer user ID, or paste the SDK key from the chat into code without
-  telling the user it is a public key made to ship in the app.
+- Never hardcode a customer user ID. Never leave the `xee_YOUR_SDK_KEY` placeholder in the code
+  and report the integration as done: fill in the app's real `sdk_key` from `list_apps`, or say
+  plainly that it is missing.
 - Never commit server URLs, MCP tokens or Apple keys anywhere. The MCP token acts as the user;
   keep it out of the project, out of chats, and out of logs.
 - Never assume anything about App Store Connect (that a product exists, that the URL is

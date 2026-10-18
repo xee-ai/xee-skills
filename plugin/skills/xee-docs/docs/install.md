@@ -40,7 +40,7 @@ Open App settings, iOS SDK in the Xee dashboard. The **SDK** section shows:
 | Server URL | The address of your Xee server, `{{server}}`. Set it with `.with(serverUrl:)` to send the SDK's requests there. |
 | Notification URL | Where Apple sends App Store Server Notifications for this app. |
 
-Each app in Xee has its own SDK key, so pick the right app if you have several. The key is public: it is meant to ship inside your app. If it leaks somewhere you did not intend, rotate it on the same tab and ship the new one.
+Each app in Xee has its own SDK key, so pick the right app if you have several. If Claude does the integration through the Xee MCP, it reads the key, the bundle ID and the server address for you with `list_apps`, so you do not have to paste them. The key is public: it is meant to ship inside your app. If it leaks somewhere you did not intend, rotate it on the same tab and ship the new one.
 
 > [!IMPORTANT]
 > Without `.with(serverUrl:)` the SDK talks to `http://localhost:7010`, the Xee server running on your Mac. That works in the iOS Simulator while the server runs on the same Mac. A real device cannot reach `localhost` on your Mac, so on a device, and in every release build, set `.with(serverUrl:)` to your real server over HTTPS.

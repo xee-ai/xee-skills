@@ -13,3 +13,4 @@ sync_products
 edit_product
 get_test_results
 propose_test
+get_app

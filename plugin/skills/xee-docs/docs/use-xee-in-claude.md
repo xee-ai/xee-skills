@@ -93,7 +93,8 @@ Say the app and paywall by the IDs you see in the dashboard. A few to start with
 
 | Tool | What it does |
 | --- | --- |
-| `list_apps` | The apps you own in Xee, with their IDs. |
+| `list_apps` | The apps you own in Xee, each with its public SDK key, bundle ID, server address and notification URL. |
+| `get_app` | One app's setup values: the same as its entry in `list_apps`. |
 | `list_paywalls` | An app's paywalls, with whether each is live and its latest version. |
 | `get_paywall` | The latest version of a paywall: its variables with their current values, its products, and the test running on it. |
 | `push_paywall_version` | Sends a new version after Claude changes the paywall view: an HTML preview with `data-xee` markers, the products and the variables. |
