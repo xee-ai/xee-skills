@@ -1,0 +1,24 @@
+[
+  { "section": "Get started", "pages": [
+    { "slug": "install", "nav": "1. Install & configure", "title": "Install & configure iOS SDK" },
+    { "slug": "make-purchases", "nav": "2. Make purchases", "title": "Make purchases" },
+    { "slug": "subscription-status", "nav": "3. Check subscription status", "title": "Check subscription status" },
+    { "slug": "identify-users", "nav": "4. Identify users", "title": "Identify users" }
+  ] },
+  { "section": "Paywalls", "pages": [
+    { "slug": "get-paywall", "nav": "Get a paywall and its values", "title": "Get a paywall and its values" },
+    { "slug": "log-paywall-views", "nav": "Log paywall views", "title": "Log paywall views" },
+    { "slug": "ab-tests", "nav": "A/B tests", "title": "A/B tests" }
+  ] },
+  { "section": "Integrate with AI", "pages": [
+    { "slug": "use-xee-in-claude", "nav": "Use Xee in Claude", "title": "Use Xee in Claude" },
+    { "slug": "claude-builds-paywall", "nav": "Let Claude build your paywall", "title": "Let Claude build your paywall" }
+  ] },
+  { "section": "Users & access", "pages": [
+    { "slug": "refund-saver", "nav": "Refund saver", "title": "Refund saver" }
+  ] },
+  { "section": "Test & release", "pages": [
+    { "slug": "sandbox-testing", "nav": "Test purchases in the sandbox", "title": "Test purchases in the sandbox" },
+    { "slug": "troubleshooting", "nav": "Troubleshooting & errors", "title": "Troubleshooting & errors" }
+  ] }
+]

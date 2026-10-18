@@ -1,0 +1,74 @@
+# Checks that every skill is well formed and names only tools and docs pages that exist, and that the
+# docs agree with the SDK. Locally: node scripts/lint-frontmatter.mjs, lint-tools.mjs, lint-docs.mjs,
+# lint-slugs.mjs, lint-secrets.mjs, sync-snippets.mjs --check and lint-symbols.mjs (the last two read the SDK checkout).
+
+name: skill-lints
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  # Docs go stale when the SDK changes and nobody touches this repository, so check every day, and
+  # whenever the SDK repository sends `sdk-changed` (see its docs-notify workflow).
+  schedule:
+    - cron: '17 6 * * *'
+  repository_dispatch:
+    types: [sdk-changed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  lints:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # The docs are checked against the SDK's current source and compiled samples.
+      - uses: actions/checkout@v4
+        with:
+          repository: xee-ai/XeeSDK-iOS
+          path: sdk
+      - name: Frontmatter (every SKILL.md has a name that matches its folder and a "Use when" description)
+        run: node scripts/lint-frontmatter.mjs
+      - name: Tools (a skill names only tools the Xee MCP has)
+        if: always()
+        run: node scripts/lint-tools.mjs
+      - name: Docs (every page in the nav has a file, and every file is in the nav)
+        if: always()
+        run: node scripts/lint-docs.mjs
+      - name: Slugs (a skill links only pages the Xee docs have)
+        if: always()
+        run: node scripts/lint-slugs.mjs
+      - name: Secrets (no token, key or local path in any file)
+        if: always()
+        run: node scripts/lint-secrets.mjs
+      - name: Snippets (every code sample in a page is the SDK's compiled sample)
+        if: always()
+        id: snippets
+        env:
+          XEE_SDK_DIR: ${{ github.workspace }}/sdk
+        run: node scripts/sync-snippets.mjs --check
+      - name: Symbols (every SDK name a page mentions exists in the SDK)
+        if: always()
+        id: symbols
+        env:
+          XEE_SDK_DIR: ${{ github.workspace }}/sdk
+        run: node scripts/lint-symbols.mjs
+      # A scheduled run has no pull request to turn red, so file an issue: drift is never silent.
+      - name: File an issue when the docs have drifted from the SDK
+        if: failure() && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Docs have drifted from the SDK"
+          open=$(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number')
+          body="The docs checks failed against the SDK's current main. Run \`/sync-docs\` in Claude Code, or see the run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          if [ -n "$open" ]; then gh issue comment "$open" --body "$body"; else gh issue create --title "$title" --body "$body"; fi

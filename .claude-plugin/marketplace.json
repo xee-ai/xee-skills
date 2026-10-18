@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "xee",
+  "description": "Xee plugins: subscriptions and paywalls for your iOS app, run by your agent.",
+  "owner": {
+    "name": "Xee"
+  },
+  "plugins": [
+    {
+      "name": "xee-skills",
+      "description": "Skills that hand your app's subscription work to your agent: add the Xee SDK to an iOS app, get the first sandbox purchase through, find out why a purchase does not unlock access, turn a paywall into testable values and read test results, and answer a question straight from Xee's docs.",
+      "author": {
+        "name": "Xee"
+      },
+      "source": "./plugin",
+      "category": "development",
+      "homepage": "https://github.com/xee-ai/xee-skills"
+    }
+  ]
+}

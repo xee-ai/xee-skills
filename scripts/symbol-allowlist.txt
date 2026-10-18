@@ -1,0 +1,2 @@
+# Names the docs may mention that are not declared in the SDK's Swift source. One per line:
+# `Xee.name`, `XeeTypeName`, or `with(label:`. Keep it empty if you can.

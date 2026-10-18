@@ -1,0 +1,15 @@
+# The tools the Xee MCP server offers (server/src/mcp.rs `tools()`). A skill may name only these.
+# Refresh from the Xee server when it gains or loses a tool; see docs/maintaining.md.
+list_apps
+list_docs
+get_doc
+list_paywalls
+get_paywall
+push_paywall_version
+list_products
+get_product
+create_product
+sync_products
+edit_product
+get_test_results
+propose_test

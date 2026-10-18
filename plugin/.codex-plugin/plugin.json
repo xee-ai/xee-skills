@@ -1,0 +1,41 @@
+{
+  "name": "xee-skills",
+  "version": "0.1.0",
+  "description": "Skills that hand your app's subscription work to your agent: add the Xee SDK to an iOS app, get the first sandbox purchase through, find out why a purchase does not unlock access, turn a paywall into testable values and read test results, and answer a question straight from Xee's docs.",
+  "author": {
+    "name": "Xee"
+  },
+  "homepage": "https://github.com/xee-ai/xee-skills",
+  "repository": "https://github.com/xee-ai/xee-skills",
+  "keywords": [
+    "xee",
+    "in-app-purchases",
+    "subscriptions",
+    "paywall",
+    "ios",
+    "swift"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Xee",
+    "shortDescription": "Subscriptions and paywalls for iOS",
+    "longDescription": "Hand your iOS app's in-app purchase work to your agent. Add the Xee SDK and activate it, load a paywall's values from Xee, diagnose a sandbox purchase that does not go through or does not unlock access, turn a paywall into testable values and read test results, and get answers from Xee's docs. Needs a Xee server and its MCP connected.",
+    "developerName": "Xee",
+    "category": "Productivity",
+    "capabilities": [
+      "read",
+      "write"
+    ],
+    "websiteURL": "https://github.com/xee-ai/xee-skills",
+    "supportURL": "https://github.com/xee-ai/xee-skills/issues",
+    "defaultPrompt": [
+      "Integrate Xee into this app with a paywall",
+      "My sandbox purchase went through but premium did not unlock. Find out why",
+      "What should I test on my paywall? Check how my test is doing"
+    ],
+    "brandColor": "#2F5FD0",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/logo.png"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,5 @@
+{
+  "note": "The SDK commit the docs were last checked against. `node scripts/docs-drift.mjs` lists what changed in the SDK since then and which pages mention it; `node scripts/docs-drift.mjs --mark` records the SDK's current commit once the docs are up to date.",
+  "sdkRepo": "https://github.com/xee-ai/XeeSDK-iOS",
+  "verifiedSdkCommit": null
+}
