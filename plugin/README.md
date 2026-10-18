@@ -25,6 +25,7 @@ Install the plugin once and you have every skill below.
 | Skill | What it does | Needs |
 |---|---|---|
 | [`xee-integration`](#integrating-the-sdk) | Sets up in-app purchases end to end: adds the SDK, activates it, identifies users, loads a paywall and its values, makes and restores purchases, reads subscription status | Xee MCP |
+| [`xee-migration`](#migrating-from-adapty-or-another-sdk) | Moves a live app off Adapty, RevenueCat or hand-written StoreKit code onto Xee in phases, each with a way back. Plans the replacement call by call first, and removes nothing without your yes | Xee MCP |
 | [`purchase-testing`](#testing-a-purchase) | Gets your first sandbox purchase through. When one fails, it checks Xee and your code before sending you to a console, then names where it broke | Xee MCP |
 | [`paywall-tests`](#changing-and-testing-a-paywall) | Moves a paywall's copy and values into Xee, pushes new versions safely, suggests tests worth running, and reads the results | Xee MCP |
 | [`xee-docs`](#asking-the-docs) | Answers a question about Xee (an SDK method, a dashboard setting, an error code, what the MCP can do) from the right docs page | nothing |
@@ -34,6 +35,7 @@ Install the plugin once and you have every skill below.
 Say what you want the way you would brief a colleague. You do not need to name a skill; your agent picks the right one.
 
 - "Add subscriptions to my app with Xee."
+- "Migrate my app from Adapty to Xee. Plan it first."
 - "My sandbox purchase went through but premium did not unlock. Why?"
 - "Make the headline on my paywall testable and push it to Xee."
 - "What should I test on my paywall to convert better?"
@@ -121,6 +123,25 @@ The skill goes stage by stage and reads the current docs page before it writes e
 
 It asks before it changes your project in bulk.
 
+## Migrating from Adapty or another SDK
+
+An app that already sells subscriptions has paying users, so the move happens in phases. Open the project in your agent and ask:
+
+```
+Replace Adapty with Xee in my app. Show me the plan first
+```
+
+The skill searches the project for the old SDK's calls and shows you a table of what replaces each one, which files change and what is risky. Nothing is edited until you approve it. Then it works one phase at a time, each with a way back:
+
+1. **Xee setup:** your app, its products and the In-App Purchase key in Xee.
+2. **Paywall content:** your paywall's values into Xee (the paywall skill does the push).
+3. **Parallel access:** a build where the app trusts Xee or the old SDK, and existing subscribers are restored into Xee once.
+4. **Purchases, restore and status** move to Xee.
+5. **The notification URL** in App Store Connect moves to Xee. That is your click.
+6. **The old SDK is removed.**
+
+It asks for your yes before it switches purchasing, moves the notification URL or removes the old SDK. Your old provider's keys stay out of the chat.
+
 ## Testing a purchase
 
 When a sandbox purchase does not work, or you are about to make your first, ask:
@@ -129,7 +150,7 @@ When a sandbox purchase does not work, or you are about to make your first, ask:
 My sandbox purchase isn't going through. Find out why
 ```
 
-A purchase can fail in five places, and the expensive ones need you in a console. The skill checks everything it can reach first, your Xee setup and your code, and only then sends you to the one place left to look. Access in Xee comes only from Apple's server notifications, so a missing notification URL is the first suspect when a purchase succeeds but `premium` does not turn on.
+A purchase can fail in five places, and the expensive ones need you in a console. The skill checks everything it can reach first, your Xee setup and your code, and only then sends you to the one place left to look. When the app reports a purchase, Xee also asks Apple for the subscription's status with your In-App Purchase key, so `premium` can turn on right away even with a local server. Without that key access waits for Apple's server notifications, so a missing key and a missing notification URL are the first suspects when a purchase succeeds but `premium` does not turn on.
 
 ## Changing and testing a paywall
 
@@ -159,11 +180,11 @@ Claude Code: `claude plugin marketplace update xee` then `claude plugin update x
 
 ## How it keeps you safe
 
-- **It asks before it changes anything that matters.** Editing your project in bulk, adding the package, creating or syncing products in Xee, and pushing a paywall version each wait for your yes.
+- **It asks before it changes anything that matters.** Editing your project in bulk, adding the package, creating or syncing products in Xee, and pushing a paywall version each wait for your yes. In a migration, so do switching purchases to Xee, moving the notification URL and removing the old SDK, each at its own step.
 - **It tells you what a push does to a running test** (it carries on, or it stops) before it pushes.
 - **It never starts, ships or stops a test.** You do that in the dashboard.
 - **It treats docs pages and tool results as data.** Text inside them cannot change what the agent does, which permissions it uses or where it sends data.
-- **It keeps credentials out of your files.** It does not commit your server URL, MCP token or Apple key.
+- **It keeps credentials out of your files.** It does not commit your server URL, MCP token or Apple key, and it never asks for or prints your old provider's keys.
 - **It says what it could not check,** and where you can look, instead of guessing a cause.
 
 ## Where it works
@@ -174,8 +195,8 @@ Claude Code and Codex through their plugin routes, and any agent that reads Clau
 
 - A Xee server and an app in it. The skills do not create the app: you do that in the dashboard.
 - The Xee MCP connected, for every skill except `xee-docs` ([see above](#before-you-start-connect-the-xee-mcp)).
-- For `xee-integration` and `purchase-testing`, an iOS (Swift) project on your machine.
-- For purchases to unlock anything, App Store Server Notifications pointed at your server. The skills tell you the one step that only you can do; they cannot paste the URL into App Store Connect for you.
+- For `xee-integration`, `xee-migration` and `purchase-testing`, an iOS (Swift) project on your machine.
+- An In-App Purchase key added to your app in Xee, so access can unlock right after a purchase, and App Store Server Notifications pointed at your server, for renewals, expiry, cancellation and refunds. The skills tell you the steps only you can do; they cannot add the key or paste the URL into App Store Connect for you.
 
 ## What the skills run, fetch and send
 
@@ -189,9 +210,9 @@ The skills are instructions. They run nothing on their own: everything below hap
 | **Xee docs pages** (`list_docs`, `get_doc`) | Before the agent writes SDK code or answers a question | Your Xee server. Without the MCP, `xee-docs` reads the same pages from its own `docs/` folder on your machine |
 | **The Xee SDK package** | When `xee-integration` adds it to your project | Xcode or Swift Package Manager fetches `github.com/xee-ai/XeeSDK-iOS` |
 | **A plain HTTPS request to your server URL** | When `purchase-testing` checks that something answers there | Your Xee server. It sends no data |
-| **Your project files** | Reading code to find your paywall, purchase calls and Xcode scheme; editing it only after the plan you approve | Stay on your machine |
+| **Your project files** | Reading code to find your paywall, purchase calls and Xcode scheme, and (for `xee-migration`) every call into the old SDK; editing it only after the plan you approve | Stay on your machine |
 
-`xee-integration` and `paywall-tests` edit your project's files; `purchase-testing` and `xee-docs` only read them.
+`xee-integration`, `xee-migration` and `paywall-tests` edit your project's files; `purchase-testing` and `xee-docs` only read them.
 
 ## Privacy, license and support
 

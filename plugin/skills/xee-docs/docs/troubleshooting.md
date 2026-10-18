@@ -65,24 +65,26 @@ do {
 
 ### No notifications in Events
 
-The Events page lists every notification Apple sent to Xee. If it stays empty after a purchase:
+The Events page lists every notification Apple sent to Xee, and every purchase Xee checked with Apple (`VERIFIED_WITH_APPLE`). If no notification appears after a purchase:
 
 - Check that the **Notification URL** from App settings, iOS SDK is pasted in App Store Connect for both Production and Sandbox, with **Version 2** chosen.
 - Check that the **Bundle ID** in App settings, iOS SDK matches the app. Notifications for another bundle are rejected.
 - If you set the **Apple app ID**, check it too. Xee rejects a production notification whose app ID does not match.
-- Your server must be reachable from the internet over HTTPS. Apple cannot reach `127.0.0.1` or a private network.
+- Your server must be reachable from the internet over HTTPS. Apple cannot reach `127.0.0.1` or a private network. A purchase can still unlock against a local server when the In-App Purchase key is set, but renewals, expiry and refunds only arrive through notifications.
 - Purchases made with a StoreKit configuration file in Xcode never reach Apple's servers, so no notification is sent. Use a sandbox account, as in [Test purchases in the sandbox](/docs/sandbox-testing).
 
 ### Purchase succeeded but premium is not active
 
-This is how Xee works today. The server does not grant access on the app's word. When the SDK reports a purchase, Xee returns the profile as it stands, and access only appears after Apple's notification for that purchase has arrived and been matched to the profile.
+Work through these in order:
 
-Xee matches a notification to a profile through the app account token that StoreKit attaches to the purchase. The SDK attaches the profile's token to every purchase, anonymous users included. A promoted purchase started from your App Store page carries no token, and Xee cannot tell whose it is. See [Make purchases](/docs/make-purchases).
+1. **The In-App Purchase key.** Without it, Xee asks Apple nothing when the SDK reports a purchase, and access waits for Apple's notification. Ask Claude to run `list_apps`: `in_app_purchase_key` must be `true`. Otherwise add the key as in [Check subscription status](/docs/subscription-status), then call `Xee.restorePurchases()` to bring in the purchase.
+2. **Events.** Find the purchase in Events. A `VERIFIED_WITH_APPLE` event means Xee checked it with Apple; a purchase notification such as `SUBSCRIBED` means Apple's own message arrived. If neither is there, the check did not run or did not pass.
+3. **The check itself.** A check that fails never fails the SDK call: the profile comes back as it stands, and your server's log says why, for example Apple refused the key, the answer was for another bundle ID, or its signature did not verify. Check that the key's Issuer ID and Key ID are right and that the **Bundle ID** matches your app.
+4. **Notifications.** If the key is set but the check failed, access still arrives with Apple's notification. See the section above if it does not.
+5. **Sandbox or Xcode.** A purchase from a StoreKit configuration file in Xcode never unlocks, because Apple has no record of it. Use a sandbox account.
+6. **Timing.** Refresh the profile with `Xee.getProfile()` a few seconds after the purchase, or update your UI from `didLoadLatestProfile` on your `XeeDelegate`.
 
-To check:
-
-1. Open Events and find the purchase notification. If it is missing, see the section above.
-2. Refresh the profile with `Xee.getProfile()` a few seconds after the purchase, or update your UI from `didLoadLatestProfile` on your `XeeDelegate`.
+Xee gives a subscription to the profile whose app account token the transaction carries, if a profile has it; otherwise to the profile it already belongs to; otherwise to the profile that reported it. A subscription never moves away from a profile that owns it, so a purchase that carried another profile's token shows up there, not on the device that reported it. See [Identify users](/docs/identify-users).
 
 ### notActivated (2002)
 

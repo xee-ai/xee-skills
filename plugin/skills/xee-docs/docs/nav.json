@@ -17,6 +17,9 @@
   { "section": "Users & access", "pages": [
     { "slug": "refund-saver", "nav": "Refund saver", "title": "Refund saver" }
   ] },
+  { "section": "Migrate", "pages": [
+    { "slug": "migrate-to-xee", "nav": "Migrate to Xee", "title": "Migrate from Adapty or another SDK" }
+  ] },
   { "section": "Test & release", "pages": [
     { "slug": "sandbox-testing", "nav": "Test purchases in the sandbox", "title": "Test purchases in the sandbox" },
     { "slug": "troubleshooting", "nav": "Troubleshooting & errors", "title": "Troubleshooting & errors" }

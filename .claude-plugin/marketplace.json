@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "xee-skills",
-      "description": "Skills that hand your app's subscription work to your agent: add the Xee SDK to an iOS app, get the first sandbox purchase through, find out why a purchase does not unlock access, turn a paywall into testable values and read test results, and answer a question straight from Xee's docs.",
+      "description": "Skills that hand your app's subscription work to your agent: add the Xee SDK to an iOS app, move a live app off Adapty or RevenueCat in phases, get the first sandbox purchase through, find out why a purchase does not unlock access, turn a paywall into testable values and read test results, and answer a question straight from Xee's docs.",
       "author": {
         "name": "Xee"
       },

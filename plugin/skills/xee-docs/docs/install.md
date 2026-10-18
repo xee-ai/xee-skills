@@ -8,7 +8,7 @@ Add the Xee SDK to your iOS app with Swift Package Manager, then activate it onc
 - An app in Xee with its bundle ID set in App settings, iOS SDK.
 
 > [!NOTE]
-> Before purchases unlock anything, Xee also needs Apple's App Store Server Notifications and your products. Paste the notification URL from App settings, iOS SDK into App Store Connect, and add your products in Xee. See [Check subscription status](/docs/subscription-status) and [Make purchases](/docs/make-purchases).
+> Before purchases unlock anything, Xee also needs your products and the app's In-App Purchase key, which lets the server check each purchase with Apple. For renewals, cancellations and refunds it also needs Apple's App Store Server Notifications: paste the notification URL from App settings, iOS SDK into App Store Connect. See [Check subscription status](/docs/subscription-status) and [Make purchases](/docs/make-purchases).
 
 ## Install the SDK
 
@@ -38,12 +38,12 @@ Open App settings, iOS SDK in the Xee dashboard. The **SDK** section shows:
 | --- | --- |
 | SDK key | The public key for this app. It starts with `xee_`. |
 | Server URL | The address of your Xee server, `{{server}}`. Set it with `.with(serverUrl:)` to send the SDK's requests there. |
-| Notification URL | Where Apple sends App Store Server Notifications for this app. |
+| Notification URL | Where Apple sends App Store Server Notifications for this app: renewals, expiry, cancellations and refunds. |
 
 Each app in Xee has its own SDK key, so pick the right app if you have several. If Claude does the integration through the Xee MCP, it reads the key, the bundle ID and the server address for you with `list_apps`, so you do not have to paste them. The key is public: it is meant to ship inside your app. If it leaks somewhere you did not intend, rotate it on the same tab and ship the new one.
 
 > [!IMPORTANT]
-> Without `.with(serverUrl:)` the SDK talks to `http://localhost:7010`, the Xee server running on your Mac. That works in the iOS Simulator while the server runs on the same Mac. A real device cannot reach `localhost` on your Mac, so on a device, and in every release build, set `.with(serverUrl:)` to your real server over HTTPS.
+> Without `.with(serverUrl:)` the SDK talks to `http://localhost:7010`, the Xee server running on your Mac. That works in the iOS Simulator while the server runs on the same Mac. A real device cannot reach `localhost` on your Mac, so on a device, and in every release build, set `.with(serverUrl:)` to your real server over HTTPS. A local server is enough to unlock purchases, because it is your server that calls Apple, but Apple's notifications reach only a server on a public HTTPS address.
 
 ## Activate the SDK
 

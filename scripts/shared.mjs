@@ -35,8 +35,15 @@ export function skillFiles() {
   return walk(SKILLS).filter((f) => f.endsWith(".md"));
 }
 
-/** The SDK repository checkout: XEE_SDK_DIR, or ../XeeSDK-iOS next to this repository. */
-export const sdkDir = () => resolve(process.env.XEE_SDK_DIR || join(ROOT, "..", "XeeSDK-iOS"));
+/**
+ * The SDK repository checkout: XEE_SDK_DIR, or the first of ../xee-sdk/ios and ../XeeSDK-iOS that exists
+ * next to this repository.
+ */
+export const sdkDir = () => {
+  if (process.env.XEE_SDK_DIR) return resolve(process.env.XEE_SDK_DIR);
+  const candidates = [join(ROOT, "..", "xee-sdk", "ios"), join(ROOT, "..", "XeeSDK-iOS")];
+  return resolve(candidates.find((c) => existsSync(join(c, "DocSnippets"))) ?? candidates[0]);
+};
 
 /** The docs: the xee-docs skill's `docs/` folder, arranged by its nav.json. */
 export const DOCS = join(SKILLS, "xee-docs", "docs");

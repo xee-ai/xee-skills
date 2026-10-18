@@ -3,7 +3,7 @@
 //   node scripts/docs-drift.mjs           print the report (exit 0)
 //   node scripts/docs-drift.mjs --mark    record the SDK's current commit as verified (once the docs are up to date)
 //
-// The SDK checkout is XEE_SDK_DIR, or ../XeeSDK-iOS. The last verified commit is docs/sdk-sync.json.
+// The SDK checkout is XEE_SDK_DIR, or ../xee-sdk/ios (else ../XeeSDK-iOS). The last verified commit is docs/sdk-sync.json.
 import { execFileSync } from "node:child_process";
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";

@@ -9,7 +9,8 @@ description: >-
   copy and values into Xee variables, pushing versions without breaking a running test, proposing
   tests with a reason, reading test results honestly, and ranking what to change on a paywall. Never
   starts, ships or stops a test: the person does that in the dashboard. Not for products, SDK setup or
-  purchases (`xee-integration`) or for explaining how a Xee feature works (`xee-docs`).
+  purchases (`xee-integration`), for replacing Adapty or RevenueCat in an app (`xee-migration`, which
+  hands the paywall step here), or for explaining how a Xee feature works (`xee-docs`).
 ---
 
 # Paywall tests
@@ -101,6 +102,12 @@ an installed build fail to decode and fall back to all its defaults (the sample 
 exactly that), so avoid type changes unless the person accepts the risk.
 
 ## Mode A: change a paywall and push a version
+
+**Handed over by `xee-migration`.** The app is moving off Adapty or RevenueCat and the paywall's
+copy and values are going into Xee. Work as below, with two differences: the old SDK keeps
+serving its own paywall until the migration switches the screen over, so a push changes nothing
+users see yet (say so at the confirm point), and the starting values come from the screen as it
+shows today, which is the version live subscribers know. Do not change the copy while moving it.
 
 ### A1. Find and read
 
@@ -277,7 +284,8 @@ the new test page with the first value as B; they still choose **Create draft** 
      the analysis there.
    - Purchasers zero while the app does sell: purchases only count for an arm when made with a
      product from that arm's `getPaywallVariantProducts` (or `reportTransaction` with the
-     variation ID). Other purchase paths are not counted.
+     variation ID). Other purchase paths are not counted. In an app that is part-way through
+     leaving Adapty or RevenueCat, purchases still made through the old SDK are one such path.
    - Viewer shares far from the `weight`s are worth a look: one arm may not be logging, or
      builds differ. Say it is worth checking; do not conclude a cause.
 5. Give a verdict in one of three honest grades:

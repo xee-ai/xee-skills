@@ -30,7 +30,7 @@ Docs go stale when the SDK changes and nobody remembers the pages. Four things s
 
 None of these can see a change in behaviour that keeps the same names, such as a different default. The pull request template and the `docs-notify` comment on the SDK repository are there to prompt a human read for that.
 
-To run the SDK-reading checks locally, keep a checkout of the SDK at `../XeeSDK-iOS`, or set `XEE_SDK_DIR`.
+To run the SDK-reading checks locally, keep a checkout of the SDK at `../xee-sdk/ios`, or set `XEE_SDK_DIR`.
 
 ### Setting it up on GitHub
 

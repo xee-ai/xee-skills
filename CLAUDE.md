@@ -4,9 +4,10 @@ Guidance for Claude Code when working in this repository.
 
 ## What this repo is
 
-Four portable, Claude-style skills for agentic CLIs (Claude Code, Codex, Cursor, Gemini CLI and others), packaged as one plugin, `xee-skills`. They help with an iOS app that uses Xee, a self-hosted subscription backend:
+Five portable, Claude-style skills for agentic CLIs (Claude Code, Codex, Cursor, Gemini CLI and others), packaged as one plugin, `xee-skills`. They help with an iOS app that uses Xee, a self-hosted subscription backend:
 
 - **`xee-integration`** adds the Xee SDK to an iOS app and wires activation, users, the paywall, purchases and subscription status. It reads the current docs page before writing each stage's code.
+- **`xee-migration`** moves a live app off Adapty, RevenueCat or hand-written StoreKit code onto Xee in phases, each with a way back. It inventories the old calls, writes a call-by-call plan for approval, and never removes the old SDK, switches purchasing or moves the notification URL without a yes at that step.
 - **`purchase-testing`** gets a first sandbox purchase through and diagnoses one that fails, checking Xee and the code before sending the person to a console.
 - **`paywall-tests`** moves a paywall's values into Xee variables, pushes versions without breaking a running test, proposes tests and reads results. It never starts a test.
 - **`xee-docs`** routes a question to the right page of Xee's docs. The other skills point at it when they have no page for what is asked.
@@ -25,7 +26,7 @@ The docs live here, in `plugin/skills/xee-docs/docs/` (`nav.json` and one Markdo
 
 ## Keeping the docs in step with the SDK
 
-The Swift samples in the docs are compiled: each block has `snippet="<id>"` and is copied from `DocSnippets/Snippets/` in the SDK repository (`../XeeSDK-iOS`, or `XEE_SDK_DIR`). Never edit the text of a marked block in a page: change the snippet in the SDK repository, then run `node scripts/sync-snippets.mjs`. When the SDK changes, run `/sync-docs` (`.claude/commands/sync-docs.md`). `docs/maintaining.md` explains the four checks.
+The Swift samples in the docs are compiled: each block has `snippet="<id>"` and is copied from `DocSnippets/Snippets/` in the SDK repository (`../xee-sdk/ios`, or `XEE_SDK_DIR`). Never edit the text of a marked block in a page: change the snippet in the SDK repository, then run `node scripts/sync-snippets.mjs`. When the SDK changes, run `/sync-docs` (`.claude/commands/sync-docs.md`). `docs/maintaining.md` explains the four checks.
 
 ## Rules for editing a skill
 

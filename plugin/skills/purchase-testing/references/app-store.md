@@ -8,7 +8,7 @@ Creating products in App Store Connect and wiring the SDK belong to `xee-integra
 
 | Walk step | Here |
 |---|---|
-| 2. Notification URL, sandbox account, phone | Pick the loop, Notification URL, Sandbox account, Phone |
+| 2. Notification URL, sandbox account, phone | Pick the loop, In-App Purchase key, Notification URL, Sandbox account, Phone |
 | 3. Buy | Run and buy |
 | 5. Restore | Restore and re-tests |
 | TestFlight comes up | The TestFlight trap |
@@ -19,24 +19,39 @@ Creating products in App Store Connect and wiring the SDK belong to `xee-integra
 |---|---|---|
 | Needs | a file in the project, no Apple account | the product in App Store Connect, a sandbox account |
 | Reaches Xee | **no**: Apple sends no notification | yes |
-| Unlocks `premium` in Xee | no | yes, after Apple's notification |
+| Unlocks `premium` in Xee | no | yes: right after the purchase when the app has an In-App Purchase key, otherwise after Apple's notification |
 | Good for | building the paywall and purchase code | answering "does this work end to end" |
 
-The trap is the middle row. A purchase from a configuration file never leaves the Mac, so
-Events stays empty by design. Someone who tests that way and then checks the dashboard
+The trap is the middle row. A purchase from a configuration file never leaves the Mac and
+Xee never sends it to Apple, so Events stays empty by design. Someone who tests that way and then checks the dashboard
 concludes the integration is broken when it is working as documented. Use the file while
 iterating; never accept it as verification.
 
+## In-App Purchase key
+
+With this key Xee asks Apple for the subscription's status when the SDK reports a purchase
+or a restore, so `premium` turns on right away, even when Apple cannot reach the server.
+Without it, access waits for Apple's notification. `in_app_purchase_key` from `list_apps`
+says whether it is set. If not, the user generates one in App Store Connect (Users and
+Access, Integrations, In-App Purchase), adds it in the Xee dashboard under Settings, Apple
+keys with its Issuer ID, Key ID and `.p8` file, and chooses it for the app in App settings,
+Apple keys, under In-App Purchase. The key stays in the dashboard: never ask for the file.
+A success shows on the Events page as `VERIFIED_WITH_APPLE`.
+
 ## Notification URL
 
-Without it nothing arrives. In the Xee dashboard copy the Notification URL from App
+Still needed even with the key: renewals, expiry, cancellation, grace period and refunds
+arrive only through it while the app is closed, and without the key even the first unlock
+waits for it. In the Xee dashboard copy the Notification URL from App
 settings, iOS SDK. In App Store Connect, open the app, then App Information, App Store
 Server Notifications. Paste it into both the Production and the Sandbox Server URL and
 choose Version 2 for each. The Bundle ID in App settings, iOS SDK must match the app
 exactly: Xee rejects notifications for any other bundle.
 
-A local server needs an HTTPS tunnel. The tunnel's address is the server URL in the app
-and the base of the Notification URL; if the tunnel's address changes, both must change.
+A local server needs an HTTPS tunnel for notifications. The tunnel's address is the server
+URL in the app and the base of the Notification URL; if the tunnel's address changes, both
+must change. With the In-App Purchase key set, the first unlock works without the tunnel; the
+tunnel matters for everything after it.
 
 ## Sandbox account
 
@@ -61,7 +76,8 @@ for a trial twice.
 
 Build from Xcode with `.with(logLevel: .verbose)` so the console shows each request. Open
 the paywall, buy a product, and tell the user to watch for the sheet saying it is a
-sandbox purchase. Then step 4: Events, Profiles, `premium` after `Xee.getProfile()`.
+sandbox purchase. Then step 4: Events (`VERIFIED_WITH_APPLE` or `SUBSCRIBED`), Profiles, `premium` after
+`Xee.getProfile()`.
 
 ## The TestFlight trap
 
@@ -73,9 +89,11 @@ to the sandbox account, install again.
 ## Restore and re-tests
 
 - **Restore:** delete the app, install again, sign in to the same sandbox account, tap
-  restore. `Xee.restorePurchases()` should return a profile with `premium` active, and
+  restore. `Xee.restorePurchases()` should return a profile with `premium` active: with the
+  In-App Purchase key Xee asks Apple again when the SDK reports the restore; without it,
   only if Apple's notifications already reached Xee for a subscription on this profile.
-  On a new device or install, identify the user with the same customer user ID first.
+  On a new device or install, identify the user with the same customer user ID first, so
+  the subscription is on their profile.
 - **Repeat a test with the same account:** Settings, Developer, Sandbox Apple Account,
   Manage, clear its purchase history. Skipping this makes the second run behave
   differently, which reads as flakiness.

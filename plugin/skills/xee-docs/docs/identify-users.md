@@ -10,16 +10,23 @@ Xee keeps a profile for every user of your app. If your app has accounts, give X
 |  | Anonymous users | Identified users |
 | --- | --- | --- |
 | Profile | A new one on each install | One per customer user ID |
-| Purchases | Carry the profile's app account token, so they unlock access on this install's profile | Carry the profile's app account token, so they unlock access on the profile that follows the customer user ID |
+| Purchases | Carry the profile's app account token, so they belong to this install's profile | Carry the profile's app account token, so they belong to the profile that follows the customer user ID |
 | Data | Tied to this install of the app | Kept with the customer user ID |
 
 ## How Xee links purchases to a profile
 
-Xee does not take the app's word for a purchase. It grants access only from the signed App Store Server Notifications Apple sends, and it finds the profile through the **app account token** on the transaction: a UUID the SDK passes to StoreKit with the purchase. A purchase unlocks access when its token is the profile's token.
+Xee does not take the app's word for a purchase. It learns about a subscription from Apple, either by asking Apple when the SDK reports a purchase or a restore, or from the signed App Store Server Notifications Apple sends. Either way, it then has to decide which profile owns the subscription. It picks the first of these that applies:
+
+1. **The profile whose app account token the transaction carries.** The token is a UUID the SDK passes to StoreKit with the purchase, and Apple repeats it in everything it says about the transaction.
+2. **The profile the subscription already belongs to.** A later notification for a subscription Xee has recorded keeps it where it is, even though it carries no token or another one.
+3. **The profile that reported it.** This applies to the SDK's purchase and restore reports, when the app has an In-App Purchase key.
+
+A subscription never moves away from a profile that owns it.
 
 - Every profile has a token, anonymous ones too. The server creates it with the profile and returns it with the profile, as `storeAccountToken` on `XeeProfile`.
 - The SDK attaches the profile's token to every purchase. Only when it has no profile from the server yet does it fall back to the token you passed, and then to the customer user ID if that ID is a UUID.
-- So an anonymous user's purchase unlocks access on their anonymous profile once Apple's notification arrives.
+- So an anonymous user's purchase belongs to their anonymous profile, and unlocks access there once Xee has checked it with Apple or received Apple's notification.
+- A purchase with no token, such as one made without Xee or through another purchase SDK before Xee, has nobody to match by token. It attaches to the profile that restores it with `Xee.restorePurchases()`, and later notifications for it keep it there. See [Migrate from Adapty or another SDK](/docs/migrate-to-xee).
 - If you pass a token to `identify` or in the configuration, Xee stores it as the profile's token. The one exception is a profile that has already bought something: it keeps the token its purchases carry, and still takes the customer user ID.
 - A token belongs to one profile. Passing a token that another profile already uses is refused.
 

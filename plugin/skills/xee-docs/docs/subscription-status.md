@@ -2,16 +2,20 @@ To decide whether to show paid content or a paywall, check the user's access lev
 
 ## Before you start
 
-Xee grants access only from the signed App Store Server Notifications Apple sends. Without them, no purchase ever shows up in a profile.
+A profile learns about a subscription in two ways:
 
-1. Open App settings, iOS SDK in the Xee dashboard and copy the **Notification URL**.
-2. In App Store Connect, open your app, **App Information**, **App Store Server Notifications**.
-3. Paste the URL for both **Production** and **Sandbox**, and choose **Version 2**.
+- **From the SDK.** When the app reports a purchase or a restore, Xee asks Apple about it with your app's In-App Purchase key and records the answer, so `premium` is on right after the purchase. This needs the key and nothing else: it works with a local server too, because your server calls Apple and Apple never has to reach it.
+- **From Apple's notifications.** Apple sends signed App Store Server Notifications to your Xee server for everything that happens later while the app may be closed: renewals, expiry, cancellation, grace period and billing retry, and refunds. Without them, a renewal or a cancellation never reaches the profile.
 
-The bundle ID in App settings, iOS SDK must match your app: notifications for any other bundle are rejected.
+Set up both:
+
+1. **In-App Purchase key.** In App Store Connect, go to Users and Access, Integrations, In-App Purchase and generate a key. Add it in [Settings, Apple keys](/settings?tab=keys) with its Issuer ID, Key ID and `.p8` file, then choose it for the app in App settings, Apple keys, under **In-App Purchase**. With Claude connected, `list_apps` shows `in_app_purchase_key: true` once it is set.
+2. **Notification URL.** Open App settings, iOS SDK in the Xee dashboard and copy the **Notification URL**. In App Store Connect, open your app, **App Information**, **App Store Server Notifications**, paste the URL for both **Production** and **Sandbox**, and choose **Version 2**. Your Xee server must be reachable from the internet over HTTPS for Apple to deliver them.
+
+The bundle ID in App settings, iOS SDK must match your app: Xee rejects notifications, and answers from Apple, for any other bundle.
 
 > [!IMPORTANT]
-> A profile changes when Apple's notification reaches your Xee server, not at the moment of purchase. The purchase also has to carry the profile's app account token, which the SDK sets on every purchase. See [Identify users](/docs/identify-users).
+> Without the In-App Purchase key, Xee asks Apple nothing and a profile changes only when Apple's notification reaches your server. That can come after the purchase call returns, and it does not come at all while Apple cannot reach your server, such as a local one. Add the key first. See [Make purchases](/docs/make-purchases) for how the check works and [Identify users](/docs/identify-users) for which profile gets the subscription.
 
 ## Get the profile
 
@@ -47,7 +51,7 @@ Xee.getProfile { result in
 | --- | --- |
 | `isActive` | Whether the user has access now. Check this one to unlock content. |
 | `vendorProductId` | The App Store product that gave the access. |
-| `activatedAt` | When Apple signed the notification behind this state. |
+| `activatedAt` | When Apple signed the notification or the transaction behind this state. |
 | `expiresAt` | When access ends, if Apple gave an end date. |
 | `willRenew` | Whether the subscription will renew. `false` once the user turns off auto-renew. |
 | `unsubscribedAt` | Set when auto-renew is off. |
@@ -55,11 +59,11 @@ Xee.getProfile { result in
 | `billingIssueDetectedAt` | Set when Apple reported a billing problem. |
 | `isRefund` | Whether the purchase was refunded or revoked. |
 
-A user who turns off auto-renew keeps `isActive` true until `expiresAt`. The profile also has `subscriptions`, keyed by product ID, with the same kind of detail per product, plus `isSandbox`. `profileId` and `customerUserId` identify the profile.
+A user who turns off auto-renew keeps `isActive` true until `expiresAt`. The profile also has `subscriptions`, keyed by product ID, with the same kind of detail per product, plus `isSandbox`. It has an entry for every subscription Xee has recorded for the profile, expired ones included, so a missing key means Xee has no record of that product for this user. `profileId` and `customerUserId` identify the profile.
 
 ## Listen for profile updates
 
-To keep the latest profile without asking for it, set a delegate. The SDK calls `didLoadLatestProfile(_:)` whenever it loads a newer profile, including after a purchase and on its regular refresh while the app is open (about once a minute). If Apple's notification arrives after the purchase call returns, a later refresh brings the new access.
+To keep the latest profile without asking for it, set a delegate. The SDK calls `didLoadLatestProfile(_:)` whenever it loads a newer profile, including after a purchase and on its regular refresh while the app is open (about once a minute). A renewal, a cancellation or a refund reaches the profile through Apple's notification, and a later refresh brings it to the app.
 
 ```swift snippet="profile-delegate"
 import Xee

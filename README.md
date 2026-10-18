@@ -1,6 +1,6 @@
 # Xee Skills
 
-Skills that hand your iOS app's subscription work to the agent you already have open: add the Xee SDK, get the first sandbox purchase through, find out why a purchase does not unlock access, turn a paywall into testable values and read test results, and answer questions from Xee's docs.
+Skills that hand your iOS app's subscription work to the agent you already have open: add the Xee SDK, move a live app off Adapty or RevenueCat in phases, get the first sandbox purchase through, find out why a purchase does not unlock access, turn a paywall into testable values and read test results, and answer questions from Xee's docs.
 
 **Everything about using them — what each skill does, what you can ask, what runs on your machine — is in the [plugin README](plugin/README.md).**
 

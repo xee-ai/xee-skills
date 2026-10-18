@@ -1,13 +1,20 @@
-Your paywall is your own view, so the purchase starts in your code: when the user taps a product, pass it to `Xee.makePurchase(product:)`. StoreKit charges the user, the SDK reports the purchase to Xee, and the user's `premium` access turns on once Apple tells Xee about it.
+Your paywall is your own view, so the purchase starts in your code: when the user taps a product, pass it to `Xee.makePurchase(product:)`. StoreKit charges the user, the SDK reports the purchase to Xee, Xee checks it with Apple, and the user's `premium` access turns on.
 
 > [!IMPORTANT]
-> Finish [Install & configure](/docs/install) first. Xee matches a purchase to a profile by its app account token. The SDK attaches the profile's token to every purchase, anonymous users included, so a purchase unlocks `premium` on the profile that made it. [Identify the user](/docs/identify-users) before they buy if you want their access to follow them across devices.
+> Finish [Install & configure](/docs/install) first, and add the app's In-App Purchase key (see [Check subscription status](/docs/subscription-status)). Without the key, access waits for Apple's notifications. The SDK attaches the profile's app account token to every purchase, anonymous users included. [Identify the user](/docs/identify-users) before they buy if you want their access to follow them across devices.
 
 ## How access turns on
 
-Xee does not grant access when the SDK reports a purchase. It grants it when Apple's signed server notification for that transaction arrives, matched to the profile by the app account token described above.
+When the SDK reports a purchase, Xee asks Apple about it: "Get All Subscription Statuses" of the App Store Server API, signed with the app's In-App Purchase key. Xee verifies Apple's signed answer against Apple's root certificates and your bundle ID, and records the subscriptions for the profile. `makePurchase` returns after that, so the profile in a successful result already shows `premium`.
 
-The notification usually comes within seconds of the purchase, but it can come after `makePurchase` returns. So the profile in a successful result may not show `premium` yet. Refresh it with `Xee.getProfile()` until it does, as in the examples below.
+- **A local server works.** The server calls Apple, so Apple does not need to reach it. Notifications are not needed for a purchase to unlock.
+- **Notifications still carry what happens later.** Renewals, expiry, cancellation, grace period and billing retry, refunds and refund-saver requests arrive while the app may be closed, and only Apple's notifications bring them. Keep the notification URL set up and your server reachable over HTTPS.
+- **Without the key, nothing is asked of Apple.** Access then waits for the notification for that purchase. It usually comes within seconds but can arrive after `makePurchase` returns, so the profile in the result may not show `premium` yet. Refresh it with `Xee.getProfile()` until it does, as in the examples below.
+- **Production first, then sandbox.** When the SDK does not say which environment a transaction is from, Xee asks Apple's production servers and then the sandbox.
+- **StoreKit testing in Xcode never unlocks.** Transactions from a StoreKit configuration file do not exist at Apple, so they are never sent and never unlock anything.
+- **A failed check never fails your call.** If Apple cannot be reached, answers an error, or its answer does not verify, `makePurchase` still succeeds and the profile comes back as it stands. The failure is in your server's log, and the notification or a later `Xee.restorePurchases()` brings the access.
+
+Each verified check shows on the Events page as `VERIFIED_WITH_APPLE`. It counts no revenue: revenue comes from Apple's own notifications.
 
 ## Make a purchase
 
@@ -26,9 +33,11 @@ func buy(_ product: XeePaywallVariantProduct) async {
         case .pending:
             // Waiting on something outside the app, such as Ask to Buy.
             break
-        case .success:
-            if await waitForPremium() {
+        case let .success(profile, _):
+            if profile.accessLevels["premium"]?.isActive ?? false {
                 // Unlock the paid features and close the paywall.
+            } else if await waitForPremium() {
+                // Access arrived a moment later. Unlock and close the paywall.
             } else {
                 // Paid, but access is not on yet. Say it may take a moment.
             }
@@ -38,7 +47,7 @@ func buy(_ product: XeePaywallVariantProduct) async {
     }
 }
 
-/// Polls the profile until Apple's notification has turned `premium` on.
+/// Polls the profile until `premium` is on. It waits for Apple's notification when Xee could not check the purchase itself.
 func waitForPremium() async -> Bool {
     for _ in 0..<10 {
         if let profile = try? await Xee.getProfile(),
@@ -61,9 +70,13 @@ func buy(_ product: XeePaywallVariantProduct) {
             switch purchase {
             case .userCancelled, .pending:
                 break
-            case .success:
-                // Refresh the profile until `premium` is on.
-                Task { _ = await waitForPremium() }
+            case let .success(profile, _):
+                if profile.accessLevels["premium"]?.isActive ?? false {
+                    // Unlock the paid features and close the paywall.
+                } else {
+                    // Not on yet: refresh the profile until `premium` is on.
+                    Task { _ = await waitForPremium() }
+                }
             }
         case let .failure(error):
             // Show the error and let the user try again.
@@ -83,7 +96,7 @@ The call returns an `XeePurchaseResult`:
 | --- | --- |
 | `.userCancelled` | The user dismissed the purchase sheet. Nothing was charged. |
 | `.pending` | The purchase needs approval outside the app (for example Ask to Buy). Nothing is charged until it is approved. |
-| `.success(profile:transaction:)` | StoreKit completed the purchase. `profile` is the user's `XeeProfile` as Xee had it at that moment, which may not include the new purchase yet. |
+| `.success(profile:transaction:)` | StoreKit completed the purchase. `profile` is the user's `XeeProfile` after Xee checked the purchase with Apple. If the app has no In-App Purchase key, or the check failed, it may not include the new purchase yet. |
 
 The result also has shortcuts: `isPurchaseSuccess`, `isPurchaseCancelled`, `isPurchasePending`, and `profile`, which is set only on success. For the StoreKit transaction itself, read `sk2Transaction` (iOS 15 and later) or `sk1Transaction`.
 
@@ -112,9 +125,14 @@ Show the offer only when `subscriptionOffer` is set. Advertising a trial the use
 
 ## Restore purchases
 
-Give the user a way to get back what they already bought, for example after reinstalling the app or on a new device. App Review expects a restore button on any screen that sells subscriptions. Call `Xee.restorePurchases()`; it sends the user's App Store history to Xee and returns their profile.
+Give the user a way to get back what they already bought, for example after reinstalling the app or on a new device. App Review expects a restore button on any screen that sells subscriptions. Call `Xee.restorePurchases()`; it reports the user's latest App Store transaction to Xee and returns their profile.
 
-Restoring does not grant access by itself. The profile shows `premium` when Xee has already received Apple's notifications for a subscription tied to this profile, so identify the user with the same customer user ID they bought with before you restore on a new device.
+What restore does depends on the iOS version:
+
+- **iOS 15 and later.** The SDK looks up the device's StoreKit history and sends the most recent transaction's ID to Xee. Xee asks Apple about it and records every subscription Apple reports for that customer on this profile. A subscription bought before Xee, with no app account token, comes onto the profile that restores it.
+- **iOS 13 and 14.** The SDK sends the app's receipt instead, and the Xee server has no route for it, so restore does not unlock access there. The profile shows `premium` only if Apple's notifications already put it there.
+
+Restoring needs the In-App Purchase key like a purchase does. Without it, the profile shows `premium` only when Xee already holds a subscription for it, from Apple's notifications; identify the user with the same customer user ID they bought with before you restore on a new device.
 
 ```swift title="async/await" snippet="restore-async"
 do {
@@ -176,7 +194,7 @@ func resume(_ product: XeeDeferredProduct) async {
 Set the delegate with `Xee.delegate = PurchaseDelegate()` early in launch, before you activate the SDK.
 
 > [!WARNING]
-> Either way, the SDK sends the App Store's payment as it came, without an app account token, and the purchase carries no paywall `variationId`. Xee cannot match the purchase to a user, so access does not turn on. Do not promote in-app purchases on your App Store page.
+> Either way, the payment comes from the App Store without an app account token and without a paywall `variationId`. With the In-App Purchase key set, Xee gives the subscription to the profile that reported it, but the sale is not attributed to a paywall. Without the key, Xee cannot match it to a user and access does not turn on. Prefer not to promote in-app purchases on your App Store page.
 
 ## Next
 

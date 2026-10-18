@@ -1,6 +1,6 @@
 ---
 name: purchase-testing
-description: Use when a sandbox or test purchase does not work, or when someone is about to make their first one with Xee. Triggers on "my sandbox purchase isn't going through", "I bought it but premium didn't unlock", "paywall is empty", "no purchase in the Xee dashboard", "restore doesn't work", "the purchase sheet never appears", "how do I test purchases". Diagnoses first, so nobody is sent to Xcode or App Store Connect before the cheap checks have run. Complements `xee-integration`, which owns writing the code and connecting the stores.
+description: Use when a sandbox or test purchase does not work, or when someone is about to make their first one with Xee. Triggers on "my sandbox purchase isn't going through", "I bought it but premium didn't unlock", "paywall is empty", "no purchase in the Xee dashboard", "restore doesn't work", "the purchase sheet never appears", "how do I test purchases". Diagnoses first, so nobody is sent to Xcode or App Store Connect before the cheap checks have run. Complements `xee-integration`, which owns writing the code and connecting the stores. Replacing Adapty, RevenueCat or other purchase code is `xee-migration`.
 ---
 
 # purchase-testing
@@ -52,22 +52,33 @@ console.
 |---|---|---|---|---|
 | 1 | Xee dashboard | the product catalogue, paywalls, their live versions | **you**, with the Xee tools | "in the Xee dashboard" |
 | 2 | App code | SDK key, server URL, activate order, paywall ID, purchase handling, reading `premium` | **you**, by reading the code | "in your code" |
-| 3 | App Store to Xee | notification URL (Sandbox and Production, version 2), bundle ID, tunnel or server reachability | partly you; the console side is the user's | "between the App Store and Xee" |
+| 3 | App Store and Xee | the app's In-App Purchase key (for the check right after a purchase), notification URL (Sandbox and Production, version 2), bundle ID, tunnel or server reachability (for notifications) | partly you (`in_app_purchase_key`); the console side is the user's | "between the App Store and Xee" |
 | 4 | App Store Connect | the product's state, price and metadata, Paid Applications agreement, sandbox accounts | partly you (`get_product`); the rest is the user's | "in App Store Connect" |
 | 5 | Phone and Xcode | sandbox sign-in, Developer Mode, StoreKit configuration file in the scheme, simulator vs device | you can read the scheme; everything on the phone is the user's | "on the phone" / "in Xcode" |
 
 The mechanism behind all five, because it decides where to look. Read the current docs
 before you quote details (see below), but this is the model:
 
-- **Access comes only from Apple's signed server notifications.** The SDK's call after a
-  purchase grants nothing. Apple sends the notification to the app's **Notification URL**;
-  Xee matches it to the profile through the app account token the SDK attaches to every
-  purchase. So "purchase succeeded, no premium" is almost always about the notification
-  not arriving or not matching, not about the purchase.
-- **Premium appears seconds after the purchase,** sometimes after the purchase call has
-  returned. The app must refresh with `Xee.getProfile()`.
+- **Access has two sources.** When the SDK reports a purchase or a restore, Xee asks Apple
+  (the App Store Server API) for the subscription's status with the app's **In-App Purchase
+  key**, checks Apple's signature and the app's bundle ID, and records it for the profile
+  that reported it. Premium unlocks right after the purchase, even with a local server
+  Apple cannot reach. Apple's signed server notifications, sent to the app's **Notification
+  URL**, still carry renewals, expiry, cancellation, grace period and refunds while the app
+  is closed. So "purchase succeeded, no premium" is about one of two things: no In-App
+  Purchase key and a notification that has not arrived or did not match, or a check that
+  failed. A failed check never fails the SDK call, so it is silent in the app.
+- **Without the In-App Purchase key** Xee asks Apple nothing and access waits for the
+  notification, as it did before. Purchases from an Xcode StoreKit configuration file are
+  never sent to Apple, key or no key.
+- **A subscription belongs to** the profile whose app account token the transaction
+  carries, else the profile it already belongs to, else the profile that reported it, and
+  never moves away from an owner.
+- **Premium appears seconds after the purchase,** or after the purchase call has returned
+  when it waits for a notification. The app must refresh with `Xee.getProfile()`.
 - **Purchases from a StoreKit configuration file in Xcode never leave the Mac.** Apple
-  sends nothing, so Xee never sees them. They prove the paywall code, not the integration.
+  sends nothing and Xee never asks Apple about them, so Xee never sees them. They prove the
+  paywall code, not the integration.
 
 ## Read the current docs, do not answer from memory
 
@@ -92,7 +103,7 @@ Call `list_apps`. If the tool is missing or fails with an auth error (a rejected
 revoked token), you cannot read Xee. Say so once and how to fix it: make a token under
 Settings, MCP in the Xee dashboard and add it to Claude Code (the exact command is on the
 `use-xee-in-claude` page; do not guess it). Then **fall back**: do all the code checks
-(step 4) yourself, and for steps 1 to 3 ask the user to look at these dashboard pages,
+(step 5) yourself, and for steps 2 to 4 ask the user to look at these dashboard pages,
 naming what to confirm on each:
 
 | Page | Confirm |
@@ -100,11 +111,12 @@ naming what to confirm on each:
 | Products | the product ID is listed and was synced |
 | Paywalls | the paywall ID exists, is live, and has a version with the product |
 | Profiles | the test user's profile and subscription card (after the purchase) |
-| Events | a `SUBSCRIBED` event with a Sandbox label (after the purchase) |
+| Events | a `VERIFIED_WITH_APPLE` or `SUBSCRIBED` event with a Sandbox label (after the purchase) |
 | App settings, iOS SDK | SDK key, server URL, Notification URL, Bundle ID |
+| App settings, Apple keys | an In-App Purchase key is chosen for the app |
 
 With the MCP connected you do not need that table for the app's own values: `list_apps` and
-`get_app` return its `sdk_key`, `bundle_id` and `server_url`. Use them for the code checks below
+`get_app` return its `sdk_key`, `bundle_id`, `server_url` and `in_app_purchase_key`. Use them for the code checks below
 (the key in the code must equal `sdk_key`; the project's bundle identifier must equal
 `bundle_id`). The notification URL is not among them: it is on App settings, iOS SDK in the
 dashboard, so the user copies it from there. The SDK key is public, but quote
@@ -113,7 +125,28 @@ only its first characters in a reply: the whole value adds nothing to the answer
 If you have several apps, match the app by name or bundle ID from the code; ask only if
 it is still ambiguous.
 
-### 1. The product is in the catalogue and Apple has it
+### 1. The In-App Purchase key is set
+
+Read `in_app_purchase_key` from `list_apps` (it says whether a key is set, never the key).
+
+- **`true`:** Xee can ask Apple about the subscription right after a purchase or restore, so
+  premium should not wait for a notification. Carry on.
+- **`false`:** say so plainly, and what it means: Xee asks Apple nothing, so access waits for
+  Apple's notification, which needs the notification URL set and the server reachable from
+  Apple. This is the most likely reason for "bought it, no premium" on a local server. It
+  is not a failure of the purchase. The user adds the key: generate an In-App Purchase key in
+  App Store Connect (Users and Access, Integrations, In-App Purchase), add it in the Xee
+  dashboard under Settings, Apple keys with its Issuer ID, Key ID and `.p8` file, then
+  choose it for the app in App settings, Apple keys, under In-App Purchase (the
+  `refund-saver` page has the steps). Never ask for the `.p8` file or its contents. Keep
+  going with the other checks; do not wait.
+
+Even with the key set, a check can fail without a sign in the app (a wrong key role, a
+bundle ID that differs from the receipt's, an Apple error). The record is on the Events page
+as `VERIFIED_WITH_APPLE` when it worked; no such event after a purchase is a lead, not a
+verdict.
+
+### 2. The product is in the catalogue and Apple has it
 
 - `list_products` (app). The product ID the app and the paywall use must be listed,
   character for character.
@@ -129,7 +162,7 @@ it is still ambiguous.
 - A product that Xee has but Apple lacks is fixed in App Store Connect or by
   `xee-integration`, not here.
 
-### 2. The paywall is live and offers the product
+### 3. The paywall is live and offers the product
 
 - `list_paywalls`: the paywall ID the app asks for must exist, be **live**, and have a
   **version** of 1 or more (0 means nothing was pushed yet). A paywall that is not live is
@@ -139,17 +172,26 @@ it is still ambiguous.
   exist; compare them with the one in the code (IDs are lowercase letters, digits, `-`,
   `_`).
 
-### 3. Is a test even possible against this server?
+### 4. Can the app and Apple reach this server?
 
-From the code, find the server URL (step 4). No `.with(serverUrl:)` means the SDK's default,
-`http://localhost:7010`. `http://`, `localhost`, `127.0.0.1` or a private address means
-Apple cannot reach it. A tunnel is needed for a local server, and
-its address becomes both the SDK's server URL and the base of the notification URL. You can
-probe the address with a plain HTTPS request: any HTTP response means something answers; no
-answer means the tunnel or server is down. That proves your machine reaches it, not that
-Apple does.
+Two different readers need to reach the server, and they need different things.
 
-### 4. The app's code
+- **The app (the SDK)** must reach it for anything to work. From the code, find the server
+  URL (step 5). No `.with(serverUrl:)` means the SDK's default, `http://localhost:7010`,
+  which works only in the Simulator against a server on the same Mac. A device needs the
+  server's real address.
+- **Apple** must reach it to deliver notifications: renewals, expiry, cancellation, refunds.
+  `http://`, `localhost`, `127.0.0.1` or a private address means Apple cannot. A tunnel (or
+  public HTTPS) is needed for that, and its address becomes the base of the notification
+  URL. **It is not needed for the first unlock** when the In-App Purchase key is set (step
+  1), so do not call a local server the cause of a missing first unlock unless the key is
+  `false`.
+
+You can probe an address with a plain HTTPS request: any HTTP response means something
+answers; no answer means the tunnel or server is down. That proves your machine reaches it,
+not that Apple does.
+
+### 5. The app's code
 
 Read the code; do not ask the user what it does. Search for and check:
 
@@ -163,9 +205,9 @@ Read the code; do not ask the user what it does. Search for and check:
 | `getPaywallVariantProducts(paywallVariant:)` | a hardcoded product list instead of the paywall's products |
 | `Xee.logShowPaywallVariant(_:)` | never called (purchases still work; A/B tests show zero viewers) |
 | `Xee.makePurchase(product:)` and its result | `.pending`, `.userCancelled` or errors swallowed; `.success` treated as "premium is on" without refreshing |
-| `Xee.getProfile()` / `didLoadLatestProfile` | no refresh after the purchase, so premium looks missing for the seconds before the notification arrives |
+| `Xee.getProfile()` / `didLoadLatestProfile` | no refresh after the purchase, so premium looks missing for the seconds before Xee has recorded it |
 | `accessLevels["premium"]?.isActive` | a different key, or never read |
-| `Xee.identify(_:withAppAccountToken:)` | called after the purchase, or with a token that belongs to another profile |
+| `Xee.identify(_:withAppAccountToken:)` | with a token that belongs to another profile. Calling it after the purchase is not what blocks the unlock (a purchase attaches to the profile that reported it), but the subscription stays on that profile and access will not follow the user to another device |
 | `restorePurchases()` | missing; App Review expects it |
 | `*.storekit` file and the scheme (`StoreKitConfigurationFileReference` in the `.xcscheme`) | a configuration file selected means purchases never reach Apple |
 | `PRODUCT_BUNDLE_IDENTIFIER` in the project | must equal the Bundle ID in App settings, iOS SDK (compare with `bundle_id` from `list_apps`; without the MCP the dashboard side is the user's check) |
@@ -201,8 +243,9 @@ Rules for the walk:
   comes up, restore to step 5.
 - **Step 3 is not the finish line.** A completed payment sheet means Apple took the
   purchase. It says nothing about Xee.
-- **Step 4 is the real check.** In the Xee dashboard: Events should list a `SUBSCRIBED`
-  notification with a Sandbox label within seconds; Profiles should show the subscription
+- **Step 4 is the real check.** In the Xee dashboard: Events should list a
+  `VERIFIED_WITH_APPLE` check (the In-App Purchase key is set) or a `SUBSCRIBED`
+  notification (it arrived from Apple), with a Sandbox label, within seconds; Profiles should show the subscription
   on the user's profile. In the app, `premium` is active after `Xee.getProfile()`.
   You cannot read Events or Profiles through the MCP, so this step is the user's. Sandbox
   purchases also count in the overview and Analytics charts: if the user wants clean
@@ -226,8 +269,9 @@ unlocked": ask the user for it only after Phase 1 has run.
 | Paywall shows, but no prices / `noProductIDsFound` (1000) | Xee dashboard or App Store Connect | product ID differs between Xee and Apple; `get_product` shows a not-ready status or "not in App Store Connect"; Paid Applications agreement not active; the sandbox account's country does not sell it |
 | Purchase sheet never opens | phone, or code | `cantMakePayments` (1003): Screen Time restrictions, or observer mode in the code; no sandbox account signed in; Developer Mode off |
 | Sheet opens but is not a sandbox purchase, or Xee never sees it | phone | a StoreKit configuration file is selected in the scheme; the real Apple Account is used instead of the sandbox one |
-| Purchase completes, Events is empty | App Store to Xee | Notification URL missing for Sandbox, or version 1 chosen; Bundle ID differs; server or tunnel not reachable; StoreKit file purchase. Xee's server logs every rejected notification with a reason |
-| Events has the purchase, `premium` not active in the app | code, or the profile | the app never refreshed after the purchase; reads a key other than `premium`; the purchase was a promoted App Store purchase (no token); `identify` left the device on another profile |
+| Purchase completes, Events is empty | App Store and Xee | `in_app_purchase_key` is `false` **and** the notification did not arrive: Notification URL missing for Sandbox, or version 1 chosen; Bundle ID differs; server or tunnel not reachable from Apple. With the key set, no `VERIFIED_WITH_APPLE` either: Bundle ID differs, or the key cannot read this app. A StoreKit file purchase never reaches Xee. Xee's server logs every rejected notification with a reason |
+| Premium only turns on after a long wait, or only for some purchases | App Store and Xee | the key is not set, so access waited for the notification; a local server Apple cannot reach delays it indefinitely. Setting the key fixes the first unlock; the notification URL still matters for renewals and refunds |
+| Events has the purchase, `premium` not active in the app | code, or the profile | the app never refreshed after the purchase; reads a key other than `premium`; the subscription belongs to another profile (its token, or an earlier owner, points there; it never moves away from an owner); `identify` left the device on another profile |
 | Works for you, not a teammate | phone | compare the two sandbox accounts and builds before touching configuration |
 | Restore finds nothing | the profile | the account signed in on the phone is not the one that bought; the app is not identified as the same user; the sandbox subscription has expired |
 | A/B test shows zero viewers | code | `logShowPaywallVariant` never called |
@@ -264,7 +308,10 @@ Say these rather than letting the user assume the pass was total, and say how th
   (Business in App Store Connect), the sandbox account list (Users and Access, Sandbox,
   Test Accounts).
 - **Events and Profiles:** no MCP tool reads them. The user opens Events and Profiles in
-  the Xee dashboard.
+  the Xee dashboard. Whether Apple's check succeeded is visible there (`VERIFIED_WITH_APPLE`),
+  not through the MCP.
+- **The In-App Purchase key itself:** `in_app_purchase_key` says it is set, not that Apple
+  accepts it.
 - **Production:** sandbox uses its own accounts and a compressed clock. A working sandbox
   purchase is necessary, not sufficient.
 
@@ -296,10 +343,11 @@ outside tables and lists. The examples show the shape, not words to copy.
 > | Product `com.example.pro.monthly` is in Xee and Apple has it | Yes, status as Apple shows it |
 > | Paywall `main` exists and is live | **No:** version 0, not live |
 > | Code asks for exactly `main` | Yes, in `PaywallScreen.swift` |
+> | In-App Purchase key is set for the app | Yes |
 > | Server URL is reachable over HTTPS | Yes |
 >
 > I can't see App Store Connect's notification URL from here: check it under your app,
-> App Information, App Store Server Notifications.
+> App Information, App Store Server Notifications. It still carries renewals and refunds.
 >
 > Reply "go" and I'll set up the paywall.
 
@@ -319,7 +367,8 @@ outside tables and lists. The examples show the shape, not words to copy.
 ## Hand-offs
 
 A code change, a missing paywall or product, or doing the notification URL for the user:
-offer the outcome, then `xee-integration` on a yes. Console steps are in
+offer the outcome, then `xee-integration` on a yes. A purchase that fails because the app
+still runs Adapty, RevenueCat or old StoreKit code beside Xee: that is `xee-migration`. Console steps are in
 `references/app-store.md`. Paywall design and A/B tests belong to sibling skills.
 
 ## End with a handoff to the user
@@ -327,5 +376,6 @@ offer the outcome, then `xee-integration` on a yes. Console steps are in
 Two or three short sentences, for example: "Your sandbox purchase reached Xee and premium
 is on. I checked the product, the paywall and your code; I couldn't see the phone or the
 Paid Applications agreement. Before release, go through the checklist on the sandbox-testing
-page and set the log level back from verbose." If it failed: the place that broke, the one
-next action, and what you could not check.
+page and set the log level back from verbose." If the In-App Purchase key was not set, say so
+here too: premium waited for Apple's notification, and the key is what removes the wait. If it
+failed: the place that broke, the one next action, and what you could not check.

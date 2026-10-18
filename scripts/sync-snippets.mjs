@@ -3,7 +3,7 @@
 //   node scripts/sync-snippets.mjs           rewrite every page's marked code blocks from the SDK
 //   node scripts/sync-snippets.mjs --check   change nothing; exit 1 if a page is out of date (CI)
 //
-// The SDK's folder is XEE_SDK_DIR, or ../XeeSDK-iOS next to this repository. A page marks a block with
+// The SDK's folder is XEE_SDK_DIR, or ../xee-sdk/ios (else ../XeeSDK-iOS) next to this repository. A page marks a block with
 // ```swift title="SwiftUI" snippet="activate-quick"; the block's text is then the snippet, never hand-edited.
 import { readdirSync, readFileSync, writeFileSync, existsSync, statSync } from "node:fs";
 import { join } from "node:path";

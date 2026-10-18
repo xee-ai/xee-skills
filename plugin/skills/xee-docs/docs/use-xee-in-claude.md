@@ -87,14 +87,16 @@ Say the app and paywall by the IDs you see in the dashboard. A few to start with
 - How is the test on the "main" paywall doing? Which arm is ahead?
 - Suggest a test for the headline of the "main" paywall and propose it in Xee.
 - Sync magicclip's products from App Store Connect.
+- Migrate my app from Adapty to Xee.
+- Which Adapty calls does my app use, and what replaces each?
 - How do I install the Xee iOS SDK? (Claude reads these docs.)
 
 ## What Claude can use
 
 | Tool | What it does |
 | --- | --- |
-| `list_apps` | The apps you own in Xee, each with its public SDK key, bundle ID, Apple app ID and server address. |
-| `get_app` | One app's setup values: the same as its entry in `list_apps`. |
+| `list_apps` | The apps you own in Xee, each with its public SDK key, bundle ID, Apple app ID, server address and `in_app_purchase_key`: `true` when the In-App Purchase key is set, which is what lets the server check purchases with Apple. |
+| `get_app` | One app's setup values: the same as its entry in `list_apps`, `in_app_purchase_key` included. |
 | `list_paywalls` | An app's paywalls, with whether each is live and its latest version. |
 | `get_paywall` | The latest version of a paywall: its variables with their current values, its products, and the test running on it. |
 | `push_paywall_version` | Sends a new version after Claude changes the paywall view: an HTML preview with `data-xee` markers, the products and the variables. |

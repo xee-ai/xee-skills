@@ -40,7 +40,7 @@ If Apple refuses the answer (any status other than 2xx), Xee records the failure
 
 1. **Notification URL.** Paste the notification URL from App settings, iOS SDK into App Store Connect for both Production and Sandbox, with **Version 2**. Refund requests arrive as notifications, so without it there is nothing to answer.
 2. **Bundle ID.** Check the **Bundle ID** in App settings, iOS SDK. Xee signs its answer for that bundle.
-3. **In-App Purchase key.** In App Store Connect, go to Users and Access, Integrations, In-App Purchase and generate a key. Add it in [Settings, Apple keys](/settings?tab=keys) with its Issuer ID, Key ID and `.p8` file, then choose it for the app in App settings, Apple keys, under **In-App Purchase**. Xee signs every answer to Apple with this key.
+3. **In-App Purchase key.** In App Store Connect, go to Users and Access, Integrations, In-App Purchase and generate a key. Add it in [Settings, Apple keys](/settings?tab=keys) with its Issuer ID, Key ID and `.p8` file, then choose it for the app in App settings, Apple keys, under **In-App Purchase**. Xee signs every answer to Apple with this key. It is the same key Xee uses to check purchases with Apple when the SDK reports one, so if purchases already unlock, it is set. With Claude connected, `list_apps` shows `in_app_purchase_key: true`.
 4. **Privacy policy.** Say in your privacy policy that you may share purchase information with Apple when a customer asks for a refund. That disclosure is yours to make, not Xee's.
 5. **Consent.** Ask customers for consent in your app and report their answer with the SDK, as below. Xee sends nothing for a customer who has not said yes.
 

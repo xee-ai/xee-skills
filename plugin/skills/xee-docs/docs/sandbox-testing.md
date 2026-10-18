@@ -2,14 +2,18 @@ Before you release, buy each product with an Apple sandbox account and check tha
 
 ## How a test purchase reaches Xee
 
-Xee does not take the app's word for a purchase. Access comes from the signed App Store Server Notifications Apple sends to your Xee server, so a test purchase only unlocks `premium` once Apple's notification has arrived.
+Xee does not take the app's word for a purchase. When the SDK reports a test purchase, Xee asks Apple about it with the app's In-App Purchase key and verifies Apple's signed answer, so `premium` turns on right after the purchase. Everything that happens later comes from the signed App Store Server Notifications Apple sends to your server.
 
-- Apple sends sandbox and TestFlight purchases to the **Sandbox** notification URL in App Store Connect, and App Store purchases to the **Production** one. Xee uses the same URL for both and records which environment each notification came from.
-- Your Xee server must be reachable from the internet over HTTPS. Apple cannot reach a server running on `127.0.0.1`, so when you test against a local server, put it behind a tunnel and use the tunnel's address as the server URL.
-- Purchases made with a StoreKit configuration file in Xcode never leave your Mac. Apple sends no notification for them, so they do not unlock anything in Xee. Test with a sandbox account instead.
+- Add the **In-App Purchase key** before you test, as in [Check subscription status](/docs/subscription-status). With Claude connected, `list_apps` shows `in_app_purchase_key: true` when it is set. Without it, Xee asks Apple nothing and a test purchase unlocks `premium` only when Apple's notification arrives.
+- A local server works for the purchase itself: your server calls Apple, so Apple does not need to reach it. Apple's notifications, which carry renewals, expiry, cancellation and refunds, need a server reachable from the internet over HTTPS. Apple cannot reach `127.0.0.1`, so to see them against a local server, put it behind a tunnel and use the tunnel's address as the notification URL.
+- Apple sends sandbox and TestFlight notifications to the **Sandbox** URL in App Store Connect, and App Store ones to the **Production** one. Xee uses the same URL for both and records which environment each notification came from.
+- Xee asks Apple's production servers first and then the sandbox, so a sandbox purchase is found without any setting.
+- Purchases made with a StoreKit configuration file in Xcode never leave your Mac. They do not exist at Apple, so Xee never sends them there and they do not unlock anything. Test with a sandbox account instead.
 - A sandbox notification never changes a subscription that came from production. Testing on a device that also has a real subscription does not overwrite it.
 
 ## 1. Set the notification URL
+
+The first purchase unlocks without it when the In-App Purchase key is set. Set it so renewals, expiry, cancellations and refunds reach Xee too.
 
 1. In Xee, open App settings, iOS SDK and copy the **Notification URL**. It looks like `{{server}}/v1/notifications/apple/your-app-id`.
 2. In App Store Connect, open your app, then App Information, App Store Server Notifications.
@@ -57,14 +61,14 @@ Then open your paywall and buy a product. Sandbox subscriptions renew on a short
 
 ## 5. Check the purchase in Xee
 
-- **Events.** Every notification from Apple is listed with its type, subtype and environment. Sandbox ones carry a **Sandbox** label. A `SUBSCRIBED` event should appear within seconds of the purchase. If the list stays empty, see [Troubleshooting & errors](/docs/troubleshooting).
+- **Events.** A `VERIFIED_WITH_APPLE` event appears right after the purchase: it is Xee's own check with Apple, and it needs the In-App Purchase key. Every notification from Apple is listed too, with its type, subtype and environment, and sandbox ones carry a **Sandbox** label. A `SUBSCRIBED` event should appear within seconds of the purchase once the notification URL is set. If the list stays empty, see [Troubleshooting & errors](/docs/troubleshooting).
 - **Profiles.** Open the user's profile. The subscription card shows the state and expiry, and each sandbox entry in User history has a **Sandbox** label.
-- **In the app.** `profile.accessLevels["premium"]?.isActive` should be `true`. If the purchase call returned before Apple's notification arrived, call `Xee.getProfile()` again, or wait for `didLoadLatestProfile` on your `XeeDelegate`.
+- **In the app.** `profile.accessLevels["premium"]?.isActive` should be `true` in the purchase result. If it is not, call `Xee.getProfile()` again, or wait for `didLoadLatestProfile` on your `XeeDelegate`.
 
 > [!NOTE]
 > Xee does not filter sandbox purchases out of the overview and Analytics charts. Expect test purchases to show up in your numbers, and keep test traffic to a test app if you need clean charts.
 
-Also test restoring: delete the app, install it again, sign in to the same sandbox account and tap your restore button. `Xee.restorePurchases()` should return a profile with `premium` active.
+Also test restoring: delete the app, install it again, sign in to the same sandbox account and tap your restore button. `Xee.restorePurchases()` should return a profile with `premium` active, and Events shows another `VERIFIED_WITH_APPLE`.
 
 ## Release checklist
 
@@ -72,7 +76,7 @@ Go through this before you submit a build for review.
 
 1. **SDK key.** The key in `XeeConfiguration.builder(withAPIKey:)` is the one shown in App settings, iOS SDK for this app. If you rotated it, ship the new one.
 2. **Server URL.** `.with(serverUrl:)` points to your production Xee server over HTTPS, not the default `http://localhost:7010`, another local address or a tunnel.
-3. **Notification URL.** It is set for both Production and Sandbox in App Store Connect, with Version 2, and the Bundle ID in App settings matches the app.
+3. **Apple setup.** The In-App Purchase key is added and chosen for the app. The notification URL is set for both Production and Sandbox in App Store Connect, with Version 2, and the Bundle ID in App settings matches the app.
 4. **Products.** Every product the paywalls offer exists in App Store Connect with the same product ID, and you have run Sync on the Products page so Xee has them. Products need complete metadata in App Store Connect before StoreKit returns them.
 5. **Paywall.** Each paywall ID your code asks for exists in Xee, is live and has at least one version. A paywall that is not live is not served to the SDK. See [Get a paywall and its values](/docs/get-paywall).
 6. **Paywall views.** Your code calls `Xee.logShowPaywallVariant(_:)` each time the paywall appears, or tests have no views to compare. See [Log paywall views](/docs/log-paywall-views).
