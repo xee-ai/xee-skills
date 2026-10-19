@@ -4,7 +4,7 @@
     { "slug": "make-purchases", "nav": "2. Make purchases", "title": "Make purchases" },
     { "slug": "subscription-status", "nav": "3. Check subscription status", "title": "Check subscription status" },
     { "slug": "identify-users", "nav": "4. Identify users", "title": "Identify users" },
-    { "slug": "migrate-to-xee", "nav": "Migrate to Xee", "title": "Migrate from Adapty or another SDK" }
+    { "slug": "migrate-to-xee", "nav": "Migrate to Xee", "title": "Migrate from another SDK" }
   ] },
   { "section": "Paywalls", "pages": [
     { "slug": "get-paywall", "nav": "Get a paywall and its values", "title": "Get a paywall and its values" },

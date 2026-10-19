@@ -1,3 +1,10 @@
+> [!NOTE]
+> Let Claude do the migration. Connect the Xee MCP (see [Use Xee in Claude](/docs/use-xee-in-claude)), open your iOS project in Claude Code and paste this prompt:
+>
+> ```text
+> Migrate this iOS app from my current purchase SDK (Adapty, RevenueCat or plain StoreKit) to Xee, in phases and without losing a subscriber. Use the Xee MCP and the xee-migration skill. First list my Xee apps, check my products, paywalls and In-App Purchase key, find every call to the old SDK in this project, and write me a call-by-call plan. Stop after the plan. Ask me before you change the project, switch purchases to Xee, move the notification URL or remove the old SDK.
+> ```
+
 If your app already sells subscriptions through Adapty, you can move to Xee in stages without a day when nobody has access. The idea is to run both for a while, bring your existing subscribers into Xee, and remove Adapty only when your own numbers say it is safe. This page is written for Adapty. If you use RevenueCat or plain StoreKit, read the last section after the plan.
 
 ## What stays the same and what changes
