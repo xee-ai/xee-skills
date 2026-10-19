@@ -240,9 +240,11 @@ Goal: Xee can serve the app, with the old SDK still in charge. Nothing in the ap
      Every default is what the screen shows today, so the first push changes nothing users
      see. You choose which values become variables; you do not rewrite them. New wording is a
      test for later (`paywall-tests`). Group 2 needs code that reads each key with today's
-     literal as its fallback: put that in the plan row that loads the paywall from Xee. The
-     user picks which suggestions to keep; push only those. If the view has nothing worth a
-     variable, say so instead of an empty group.
+     literal as its fallback: put that in the plan row that loads the paywall from Xee. Show
+     both groups in one variables table, the suggestions as rows marked suggested, never as an
+     "optional, I can also..." line at the end. The user strikes the rows they don't want; push
+     only what is left. If the view has nothing worth a variable, say so instead of an empty
+     group.
    - `html`: a preview of the screen as the app shows it today, with `data-xee` markers on
      the values of both groups.
 

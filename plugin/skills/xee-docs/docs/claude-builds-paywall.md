@@ -14,7 +14,7 @@ Ask it in plain words, for example: *Make the paywall's button say "Start free t
 
 ## A new paywall: what becomes a variable
 
-For a paywall's first version, Claude reads the view and lists every value that shapes the decision to buy: the headline, the subhead, benefit bullets, social-proof numbers, the button text, badges, which plan is preselected, and whether a block shows. It suggests the few worth testing, usually three to eight. Each suggestion comes with its key, its type, its default and the file and line it comes from. If the app already reads values from another SDK's remote config, those come first, with their live values. You choose which to keep.
+For a paywall's first version, Claude reads the view and lists every value that shapes the decision to buy: the headline, the subhead, benefit bullets, social-proof numbers, the button text, badges, which plan is preselected, and whether a block shows. It suggests the few worth testing, usually three to eight. Each suggestion comes with its key, its type, its default and the file and line it comes from. If the app already reads values from another SDK's remote config, those come first, with their live values. All of them go in one table, with the suggestions marked as suggested. They are rows you strike, not an optional offer you have to ask for.
 
 - **The default is what the screen shows today.** Claude picks which values become variables; it does not rewrite them. New wording is a test for later.
 - **Prices, periods, trial lengths and intro offers stay with the product** (`localizedPrice`, `subscriptionPeriod`, `subscriptionOffer`). A price typed into a variable goes stale and is wrong in other storefronts.
