@@ -84,8 +84,10 @@ Verify against the live docs; these are the values to expect.
 | Localization | Xee holds one set of values per paywall. It has no per-language values. |
 
 `get_paywall` returns for each variable its `default` (what the last push set) and `current` (what
-is served now: the default, or a winner the person shipped), plus `products` and `running_test`
-(`key` and the arms with their values and weights).
+is served now: the default, or a winner the person shipped) and `testable`, plus `products` and
+`running_test` (`key` and the arms with their values and weights). `testable: false` means the
+person took that value out of testing on the paywall page: the app still gets it, but do not
+propose a test on it (`propose_test` refuses it), and do not remove it from the paywall.
 
 ## A push is a production change
 
@@ -267,7 +269,7 @@ latest version. If they want to test now, go to mode B.
 
 ## Mode B: propose tests worth running
 
-1. Read `get_paywall` (variables, `running_test`), `get_test_results` (what has been tried, what
+1. Read `get_paywall` (variables, `running_test`; leave out every variable with `testable: false`), `get_test_results` (what has been tried, what
    it showed), and the view. If a test is running, say that no other test can start until it ends;
    anything you propose is for afterwards.
 2. Ask one thing if you do not know it: roughly how many people see the paywall in a week. If the
