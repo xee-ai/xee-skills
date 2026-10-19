@@ -17,7 +17,7 @@ The skills depend on two things the Xee server owns. Keep these files in step wi
 3. Update the routing table in `plugin/skills/xee-docs/SKILL.md`, and the stage table in `xee-integration` if the page is one of its stages.
 4. Push to `main`. The dashboard shows it after GitHub's file server refreshes its copy (it caches each file for 5 minutes) and the dashboard's own one-minute cache: allow up to about 6 minutes. Seeing the old page right after a push is normal. The Xee server shows it at once if its `DOCS_SOURCE_URL` is set to the same folder; otherwise on its next build, which embeds a snapshot of these files.
 
-A page is Markdown in the small subset the dashboard renders (`##` and `###` headings, lists, tables, fenced code, `> [!TIP]` callouts). It has no `# ` title: the title comes from `nav.json`. It may use `{{server}}` and `{{sdk_repo}}`, which the dashboard and the MCP fill in.
+A page is Markdown in the small subset the dashboard renders (`##` and `###` headings, lists, tables, fenced code, `> [!TIP]` callouts, which take a title of their own: `> [!NOTE] My title`; a ```prompt block is text to paste into an AI tool, and it wraps). It has no `# ` title: the title comes from `nav.json`. It may use `{{server}}` and `{{sdk_repo}}`, which the dashboard and the MCP fill in.
 
 ## When the SDK changes
 
