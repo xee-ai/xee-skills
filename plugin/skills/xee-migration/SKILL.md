@@ -246,7 +246,8 @@ Goal: Xee can serve the app, with the old SDK still in charge. Nothing in the ap
      only what is left. If the view has nothing worth a variable, say so instead of an empty
      group.
    - `html`: a preview of the screen as the app shows it today, with `data-xee` markers on
-     the values of both groups.
+     the values of both groups, in the font the Swift view uses, loaded from Google Fonts (the
+     `paywall-tests` rules for `html` say how to pick it).
 
    Read the `paywall-tests` rules for variable keys, types and `html` before the push. Say the
    ID out loud first: `create_paywall` makes exactly that ID, so a typo leaves a stray

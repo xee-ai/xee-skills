@@ -216,8 +216,23 @@ stops the headline test; no winner is applied"); and the production sentence fro
 
 Then call `push_paywall_version` with `app`, `paywall`, `base_version`, `html`, `products`, and
 `variables` (`key`, `type`, `default`, plus `renamed_from` where it applies). Build `html` as a
-static, self-contained preview of the view (inline styles, no scripts, no external requests, no
-user data), with `data-xee` on every element that shows a variable.
+static, self-contained preview of the view (inline styles, no scripts, no user data), with
+`data-xee` on every element that shows a variable. The only outside request allowed is Google
+Fonts, so the preview's type matches the app:
+
+- **Find the font the view uses**: `.font(.custom("Roboto-Bold", size:))`, `UIFont(name:)`, a
+  font modifier or theme the view calls, the files under `UIAppFonts` in `Info.plist`.
+- **On Google Fonts** (Roboto, Inter, Poppins, Montserrat and the like): the same family, with only
+  the weights the view uses, as `<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">`
+  at the top of `html`. Map the Swift weights (`.regular` 400, `.medium` 500, `.semibold` 600,
+  `.bold` 700, `.heavy` 800, `.black` 900).
+- **Not on Google Fonts**: the closest one by look, and say which you chose.
+- **The system font** (`.system`, no custom font): SF Pro is not on Google Fonts, so use
+  `font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif` with Inter linked. It
+  shows the real system font on Apple devices and Inter elsewhere.
+- Always end `font-family` with a generic family (`sans-serif`), so the preview still reads if the
+  font does not load. The dashboard's preview allows only `fonts.googleapis.com` and
+  `fonts.gstatic.com`.
 
 - **Conflict** (`latest is N`): call `get_paywall` again, redo your change on top of the new
   version, and show the person what changed under you before pushing again.
