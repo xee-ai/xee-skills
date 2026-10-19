@@ -50,10 +50,8 @@ Build and run from Xcode, or install a TestFlight build. TestFlight purchases ar
 Turn on verbose logs while you test, so the console shows each request the SDK makes:
 
 ```swift snippet="sandbox-verbose-logs"
-let configuration = XeeConfiguration.builder(withAPIKey: "xee_YOUR_SDK_KEY")
-    .with(logLevel: .verbose)
-    .build()
-try await Xee.activate(with: configuration)
+Xee.logLevel = .verbose
+try await Xee.activate(withAPIKey: "xee_YOUR_SDK_KEY")
 ```
 
 Then open your paywall and buy a product. Sandbox subscriptions renew on a shortened schedule (a month lasts minutes), so you can watch renewals and expiry happen within one session.
@@ -73,7 +71,7 @@ Also test restoring: delete the app, install it again, sign in to the same sandb
 
 Go through this before you submit a build for review.
 
-1. **SDK key.** The key in `XeeConfiguration.builder(withAPIKey:)` is the one shown in App settings, iOS SDK for this app. If you rotated it, ship the new one.
+1. **SDK key.** The key you pass to `Xee.activate(withAPIKey:)` is the one shown in App settings, iOS SDK for this app. If you rotated it, ship the new one.
 2. **Server URL.** Either no `.with(serverUrl:)`, so the SDK uses `https://api.xee.ai`, or one that points to your production Xee server over HTTPS, not a local address or a tunnel.
 3. **Apple setup.** The In-App Purchase key is added and chosen for the app. The notification URL is set for both Production and Sandbox in App Store Connect, with Version 2, and the Bundle ID in App settings matches the app.
 4. **Products.** Every product the paywalls offer exists in App Store Connect with the same product ID, and you have run Sync on the Products page so Xee has them. Products need complete metadata in App Store Connect before StoreKit returns them.

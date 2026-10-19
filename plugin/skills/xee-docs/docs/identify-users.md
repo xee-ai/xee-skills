@@ -31,24 +31,27 @@ A subscription never moves away from a profile that owns it.
 - A token belongs to one profile. Passing a token that another profile already uses is refused.
 
 > [!TIP]
-> Identifying users before they buy is still good practice. A purchase unlocks access without it, but only a customer user ID lets that access follow the user to another device. Pass the customer user ID and the app account token in the configuration at activation, as below.
+> Identifying users before they buy is still good practice. A purchase unlocks access without it, but only a customer user ID lets that access follow the user to another device. Pass the customer user ID at activation and the app account token with `Xee.identify`, as below.
 
 Use a UUID that stays the same for the user. Generate it once when the account is created and keep it with the account on your backend. If your customer user IDs are UUIDs, you can pass the ID itself as the token: `UUID(uuidString: user.id)`.
 
 ## Identify at activation
 
-If the user is signed in when the app starts, put their ID and token in the configuration. The SDK then creates the profile with both, without an anonymous profile first.
+If the user is signed in when the app starts, pass their ID to `Xee.activate`. The SDK then creates the profile with that ID, without an anonymous profile first. To send the app account token too, call `Xee.identify(_:withAppAccountToken:)` right after, as in **Identify after login** below.
 
-```swift snippet="identify-at-activation"
-let configuration = XeeConfiguration
-    .builder(withAPIKey: "xee_YOUR_SDK_KEY")
-    .with(customerUserId: user.id, withAppAccountToken: user.appAccountToken)
-    .build()
-
-try await Xee.activate(with: configuration)
+```swift title="Swift" snippet="identify-at-activation"
+try await Xee.activate(withAPIKey: "xee_YOUR_SDK_KEY", customerUserId: user.id)
 ```
 
-`user.id` and `user.appAccountToken` stand for the values from your own account system. Never hardcode the customer user ID: every install would share one profile.
+```swift title="Swift-Callback" snippet="identify-at-activation-completion"
+Xee.activate(withAPIKey: "xee_YOUR_SDK_KEY", customerUserId: user.id) { error in
+    if let error {
+        // handle the XeeError
+    }
+}
+```
+
+`user.id` stands for the value from your own account system. Never hardcode the customer user ID: every install would share one profile.
 
 This only works this way on a device where the SDK has no profile yet, such as the first launch after install. If the device already has a profile from an earlier launch, the SDK keeps that profile and the rules in **Identify after login** below apply.
 
@@ -56,7 +59,7 @@ This only works this way on a device where the SDK has no profile yet, such as t
 
 When the user signs in or signs up after the app has started, call `Xee.identify(_:withAppAccountToken:)`.
 
-```swift title="async/await" snippet="identify-after-login-async"
+```swift title="Swift" snippet="identify-after-login-async"
 do {
     try await Xee.identify(user.id, withAppAccountToken: user.appAccountToken)
 } catch {
@@ -64,7 +67,7 @@ do {
 }
 ```
 
-```swift title="Completion handler" snippet="identify-after-login-completion"
+```swift title="Swift-Callback" snippet="identify-after-login-completion"
 Xee.identify(user.id, withAppAccountToken: user.appAccountToken) { error in
     if let error {
         // handle the XeeError
@@ -87,7 +90,7 @@ Wait for `identify` to finish before you call other Xee methods. Calls made whil
 
 When the user signs out, call `Xee.logout()`. The SDK then starts a new anonymous profile on this device.
 
-```swift title="async/await" snippet="logout-async"
+```swift title="Swift" snippet="logout-async"
 do {
     try await Xee.logout()
 } catch {
@@ -95,7 +98,7 @@ do {
 }
 ```
 
-```swift title="Completion handler" snippet="logout-completion"
+```swift title="Swift-Callback" snippet="logout-completion"
 Xee.logout { error in
     if error == nil {
         // logged out

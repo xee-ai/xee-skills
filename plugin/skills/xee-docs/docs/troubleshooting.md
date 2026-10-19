@@ -2,12 +2,11 @@ This page covers the problems people hit most often with Xee and lists every err
 
 ## Turn on logs
 
-Set the level when you build the configuration, so it applies from the first call:
+Set the level before you activate, so it applies from the first call:
 
-```swift snippet="troubleshooting-verbose-configuration"
-let configuration = XeeConfiguration.builder(withAPIKey: "xee_YOUR_SDK_KEY")
-    .with(logLevel: .verbose)
-    .build()
+```swift snippet="troubleshooting-verbose-logs"
+Xee.logLevel = .verbose
+try await Xee.activate(withAPIKey: "xee_YOUR_SDK_KEY")
 ```
 
 You can also change it at any time with `Xee.logLevel = .verbose`. The levels, from least to most output:

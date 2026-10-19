@@ -11,7 +11,7 @@ Your app asks Xee for a paywall by its paywall ID and gets back two things: the 
 
 Call `Xee.getPaywallVariant(paywallId:)` with the paywall ID from the dashboard:
 
-```swift title="async/await" snippet="get-paywall-async"
+```swift title="Swift" snippet="get-paywall-async"
 import Xee
 
 do {
@@ -22,7 +22,7 @@ do {
 }
 ```
 
-```swift title="Completion handler" snippet="get-paywall-completion"
+```swift title="Swift-Callback" snippet="get-paywall-completion"
 import Xee
 
 Xee.getPaywallVariant(paywallId: "main") { result in
@@ -113,7 +113,7 @@ The full `PaywallValues` struct, with a SwiftUI and a UIKit version, is in [Let 
 
 Pass the paywall to `Xee.getPaywallVariantProducts(paywallVariant:)`. It loads the products from the App Store, in the order the version lists them, with offer eligibility already worked out:
 
-```swift title="async/await" snippet="get-products-async"
+```swift title="Swift" snippet="get-products-async"
 do {
     let products = try await Xee.getPaywallVariantProducts(paywallVariant: paywall)
     // Show one row or button per product.
@@ -122,7 +122,7 @@ do {
 }
 ```
 
-```swift title="Completion handler" snippet="get-products-completion"
+```swift title="Swift-Callback" snippet="get-products-completion"
 Xee.getPaywallVariantProducts(paywallVariant: paywall) { result in
     switch result {
     case let .success(products):

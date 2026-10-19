@@ -70,17 +70,24 @@ Search your project for `Adapty.` and write down every call, every placement ID,
 
 Adapty still sells. Your paywall now reads its values and its product list from Xee. Activate Xee in observer mode so it leaves StoreKit to Adapty; in observer mode `makePurchase` is not available, which is what you want here.
 
-```swift title="Activate beside Adapty" snippet="migrate-activate"
-let configuration = XeeConfiguration
-    .builder(withAPIKey: "xee_YOUR_SDK_KEY")
-    .with(customerUserId: user.id, withAppAccountToken: user.appAccountToken)
-    .with(observerMode: true) // While Adapty still sells. Remove this line when Xee takes over purchases.
-    .build()
-
-try await Xee.activate(with: configuration)
+```swift title="Swift" snippet="migrate-activate"
+// Observer mode leaves StoreKit to Adapty. Remove observerMode when Xee takes over purchases.
+try await Xee.activate(withAPIKey: "xee_YOUR_SDK_KEY", observerMode: true)
+try await Xee.identify(user.id, withAppAccountToken: user.appAccountToken)
 ```
 
-```swift title="Paywall and products from Xee" snippet="migrate-paywall"
+```swift title="Swift-Callback" snippet="migrate-activate-completion"
+// Observer mode leaves StoreKit to Adapty. Remove observerMode when Xee takes over purchases.
+Xee.activate(withAPIKey: "xee_YOUR_SDK_KEY", observerMode: true) { error in
+    if error == nil {
+        Xee.identify(user.id, withAppAccountToken: user.appAccountToken)
+    }
+}
+```
+
+Then read the paywall and its products from Xee:
+
+```swift title="Swift" snippet="migrate-paywall"
 // Adapty's placement ID is now the paywall ID you created in Xee.
 let paywall = try await Xee.getPaywallVariant(paywallId: "onboarding")
 let products = try await Xee.getPaywallVariantProducts(paywallVariant: paywall)

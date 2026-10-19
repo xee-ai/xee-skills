@@ -20,7 +20,7 @@ Each verified check shows on the Events page as `VERIFIED_WITH_APPLE`. It counts
 
 Pass a product you got from the paywall with `Xee.getPaywallVariantProducts(paywallVariant:)` (see [Get a paywall and its values](/docs/get-paywall)). Then check the result:
 
-```swift title="async/await" snippet="make-purchase-async"
+```swift title="Swift" snippet="make-purchase-async"
 import Xee
 
 func buy(_ product: XeePaywallVariantProduct) async {
@@ -60,7 +60,7 @@ func waitForPremium() async -> Bool {
 }
 ```
 
-```swift title="Completion handler" snippet="make-purchase-completion"
+```swift title="Swift-Callback" snippet="make-purchase-completion"
 import Xee
 
 func buy(_ product: XeePaywallVariantProduct) {
@@ -134,7 +134,7 @@ What restore does depends on the iOS version:
 
 Restoring needs the In-App Purchase key like a purchase does. Without it, the profile shows `premium` only when Xee already holds a subscription for it, from Apple's notifications; identify the user with the same customer user ID they bought with before you restore on a new device.
 
-```swift title="async/await" snippet="restore-async"
+```swift title="Swift" snippet="restore-async"
 do {
     let profile = try await Xee.restorePurchases()
     if profile.accessLevels["premium"]?.isActive ?? false {
@@ -147,7 +147,7 @@ do {
 }
 ```
 
-```swift title="Completion handler" snippet="restore-completion"
+```swift title="Swift-Callback" snippet="restore-completion"
 Xee.restorePurchases { result in
     switch result {
     case let .success(profile):

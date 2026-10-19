@@ -21,7 +21,7 @@ The bundle ID in App settings, iOS SDK must match your app: Xee rejects notifica
 
 Call `Xee.getProfile()` when you need the current state, for example at launch or before opening a paid screen. It asks the server each time. If the server cannot be reached, it returns the cached profile instead.
 
-```swift title="async/await" snippet="get-profile-async"
+```swift title="Swift" snippet="get-profile-async"
 do {
     let profile = try await Xee.getProfile()
     if profile.accessLevels["premium"]?.isActive ?? false {
@@ -32,7 +32,7 @@ do {
 }
 ```
 
-```swift title="Completion handler" snippet="get-profile-completion"
+```swift title="Swift-Callback" snippet="get-profile-completion"
 Xee.getProfile { result in
     if let profile = try? result.get(),
        profile.accessLevels["premium"]?.isActive ?? false {

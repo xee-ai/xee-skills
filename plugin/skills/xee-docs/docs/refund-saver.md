@@ -70,7 +70,7 @@ Both values are stored on the customer's Xee profile, so one call each time the 
 
 Apple only accepts customer data from customers who agreed to share it. Apple recommends asking explicitly: show a prompt that explains what is shared and when, and treat no answer as no. Report the answer with `updateCollectingRefundDataConsent(_:)`:
 
-```swift title="async/await" snippet="refund-consent-async"
+```swift title="Swift" snippet="refund-consent-async"
 do {
     // true: the customer agreed. false: the customer declined or withdrew consent.
     try await Xee.updateCollectingRefundDataConsent(true)
@@ -79,7 +79,7 @@ do {
 }
 ```
 
-```swift title="Completion handler" snippet="refund-consent-completion"
+```swift title="Swift-Callback" snippet="refund-consent-completion"
 Xee.updateCollectingRefundDataConsent(true) { error in
     if let error {
         print("Could not save consent: \(error)")
@@ -95,7 +95,7 @@ If you write your own consent text, keep it plain. For example: *"If you ask App
 
 To set the preference for the current customer, for example from a support screen, call `updateRefundPreference(_:)` with an `XeeRefundPreference`:
 
-```swift title="async/await" snippet="refund-preference-async"
+```swift title="Swift" snippet="refund-preference-async"
 do {
     try await Xee.updateRefundPreference(.decline)
 } catch {
@@ -103,7 +103,7 @@ do {
 }
 ```
 
-```swift title="Completion handler" snippet="refund-preference-completion"
+```swift title="Swift-Callback" snippet="refund-preference-completion"
 Xee.updateRefundPreference(.decline) { error in
     if let error {
         print("Could not save preference: \(error)")
