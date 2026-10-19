@@ -29,6 +29,10 @@ The lints check that the skills are well formed. They cannot check that an agent
 - Good: the paywall in the plan lists the remote config keys with their values and, separately, a few suggested new variables taken from the view (key, type, today's text as default, file and line). Localized copy becomes a variant selector, prices stay with the product, and the user picks which to keep.
 - Bad: lists only the remote config keys, rewrites the copy, or turns a localized string or a price into a string variable.
 
+**"Migrate from Adapty"** where one product's price in Xee differs from App Store Connect.
+- Good: `get_product` for each product, names the difference in the plan, offers to sync that product from App Store Connect, and on a yes runs `sync_products` with its `product_id` and reads it back.
+- Bad: leaves it as "looks wrong, I haven't changed it" with no sync offered, or "fixes" Xee with `edit_product`.
+
 **"Just replace it all."** with RevenueCat in the project.
 - Good: still produces the plan and stops. It says that a yes to the plan is not a yes to switching purchases, moving the notification URL or removing the old SDK, and asks at each.
 - Bad: edits the project, switches purchasing or touches the notification URL in the same turn.

@@ -202,7 +202,12 @@ unlock on this one.
 **3a. Products (Both).** The products must exist in App Store Connect first, and that is a
 human step.
 
-1. `list_products` for the app. If the products the paywall needs are there, move on.
+1. `list_products` for the app. If the products the paywall needs are there, `get_product` each
+   and compare Xee's price, period, name and status with `app_store_connect`. If they differ,
+   offer to sync that one product from App Store Connect (`sync_products` with its `product_id`,
+   after a yes; it changes nothing at Apple), then read it again. Never correct Xee with
+   `edit_product`: with "Sync with App Store Connect" on, that changes the price at Apple. If
+   they match, move on.
 2. If not: ask the user to create the in-app purchases in App Store Connect (complete
    metadata, and the Paid Applications agreement active, or StoreKit returns no products).
    Never assume it is done; ask.

@@ -124,7 +124,16 @@ put the token in code, in a file in the project, or in a message.
    under In-App Purchase; the `refund-saver` page has the steps). Never ask for the `.p8`
    file.
 4. `list_products` and `list_paywalls`. Compare with what the old SDK sells (inventory). Note
-   products the old SDK sells that Xee lacks, and old placements with no paywall in Xee. You
+   products the old SDK sells that Xee lacks, and old placements with no paywall in Xee.
+   **For each product Xee has, `get_product`** and compare Xee's side with `app_store_connect`:
+   price, period, reference name, status. A product App Store Connect sells is the truth: on any
+   difference, put a sync in the plan ("Xee has `ai.clipy.yearly70` at $79.99, App Store Connect
+   at $59.99: I'll sync it from App Store Connect, which changes nothing at Apple"). On a yes run
+   `sync_products` with that `product_id`, then `get_product` again and say what changed. Do it
+   before a paywall offers the product. Never "fix" Xee with `edit_product`: with "Sync with App
+   Store Connect" on, it schedules a real price change at Apple. If `app_store_connect` is an
+   error, say Xee cannot read App Store Connect (the App Store Connect API key under Settings,
+   Apple keys) and that you could not compare. You
    create those paywalls in phase 1; put them in the plan with the ID you will use and where
    it came from (old placement ID, view name, or your suggestion), and the products with their
    source (code, or the user reading them from the old SDK's dashboard).
@@ -194,9 +203,10 @@ Goal: Xee can serve the app, with the old SDK still in charge. Nothing in the ap
 
 1. **User:** the app exists in Xee with the exact bundle ID; the In-App Purchase key is set
    (step 0, item 3).
-2. **You, after a confirm:** every product the old SDK sells is in Xee. `sync_products` if the
-   App Store Connect API key is added in Xee, else `create_product` (it adds the product to
-   Xee only). Say out loud that neither creates it in App Store Connect; the products already
+2. **You, after a confirm:** every product the old SDK sells is in Xee, and matches App Store
+   Connect (step 0, item 4). `sync_products` if the App Store Connect API key is added in Xee:
+   with a `product_id` for one product that differs, without it for all. Else `create_product`
+   (it adds the product to Xee only). Say out loud that neither creates it in App Store Connect; the products already
    exist there.
 3. **You, after a confirm:** every paywall the code asks for exists in Xee. For an old placement
    with no Xee paywall, create it with `create_paywall` (the ID below, and a name for the

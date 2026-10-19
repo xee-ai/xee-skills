@@ -47,7 +47,7 @@ let restored = try await Adapty.restorePurchases()
 
 - **The notification URL.** Apple's notifications carry renewals, expiry, cancellations and refunds. Phase 5 moves the notification URL to Xee, and you set it in App Store Connect. See [Install & configure](/docs/install).
 - **The app in Xee,** with the same bundle ID as the app. Notifications and answers for another bundle are rejected.
-- **Your products in Xee.** Run Sync on the Products page, or ask Claude to run `sync_products`.
+- **Your products in Xee.** Run Sync on the Products page, or ask Claude to run `sync_products`. Claude also compares each product in Xee with App Store Connect (`get_product`). If a price, period, name or status differs, the plan says which, and on your yes Claude syncs that one product from App Store Connect. That changes Xee only, nothing at Apple. Claude never changes Xee's price with `edit_product` to make it match, because with Sync with App Store Connect on that would change the price at Apple.
 - **The In-App Purchase key,** added in Settings, Apple keys and chosen for the app. Restoring existing subscribers depends on it. `list_apps` shows `in_app_purchase_key: true` when it is set.
 - **The SDK key** from App settings, iOS SDK.
 - **iOS 15 or later for restore.** The package builds for iOS 13, but on iOS 13 and 14 the SDK restores through the app's receipt, and the Xee server has no route for it. Users on those versions cannot be brought in by restore.
