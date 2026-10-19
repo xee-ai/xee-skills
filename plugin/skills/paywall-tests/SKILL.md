@@ -216,24 +216,52 @@ Show a short summary and wait for a yes: the paywall and the version you are pus
 changed; **what happens to the running test, in one line** ("the headline test carries on" or "this
 stops the headline test; no winner is applied"); and the production sentence from earlier.
 
-Then call `push_paywall_version` with `app`, `paywall`, `base_version`, `html`, `products`, and
-`variables` (`key`, `type`, `default`, plus `renamed_from` where it applies). Build `html` as a
-static, self-contained preview of the view (inline styles, no scripts, no user data), with
-`data-xee` on every element that shows a variable.
+**Build `html`** before the summary, so the person can see the preview you will push: a static,
+self-contained preview of the view (`style` attributes or one `<style>` block, no CSS file, no
+scripts, no user data), with `data-xee` on every element that shows a variable.
 
 **Size and state.** The dashboard shows `html` in a 390 by 844 frame, one iPhone screen, with no
-page margin. SwiftUI points are CSS pixels, so copy the view's sizes as they are.
+page margin. SwiftUI points are CSS pixels, so copy the view's sizes as they are. Draw it for a
+390-point iPhone with a notch: where the view picks sizes by device (`isSmallDevice`, size
+classes), take the ones that phone gets.
 
 - Fluid width: the root is `width:100%` and `min-height:100vh` with `box-sizing:border-box`, never
   a fixed pixel width. Long text wraps instead of running off the edge.
 - One screen, no scrolling, the way the view fits on the phone. If the real view scrolls, show
   what is visible before the user scrolls.
+- Leave the iPhone's safe areas: 59 px at the top for the status bar and 34 px at the bottom for
+  the home indicator, unless the view's content ignores the safe area (a background that does is
+  not enough).
 - One state: what most users see today, each variable at its default. A variant selector marks
-  the element that shows variant `0`; do not stack the variants. A block that shows only in one
-  state (trial on or off, a skip button after a delay) is shown as it is at its default.
+  the element that shows variant `0`; do not stack the variants. Two variables the app picks
+  between by state (`headline` and `headline_trial`): draw and mark the one shown at default; the
+  other has its number in the dashboard's list only. A block that shows only in one state (trial
+  on or off) is shown as it is at its default. Something that appears after a delay (a skip
+  button) is drawn as it looks once shown, and carries the marker of the variable that sets the
+  delay. Put a marker on the element itself (the "Skip" label), never on the row or stack around it.
+- **Which product has a trial or intro offer** decides the default state (headline, toggle,
+  selected plan, the trial line). No Xee tool returns it. Look for a `.storekit` file or the
+  product IDs in the code; if neither says (a check at runtime, such as `product.trialDays`, does
+  not say), **ask the person** which product has the offer and its length before drawing. Never
+  guess one.
+- Prices, per-week lines and save badges use the catalogue's prices (`list_products`) and the
+  code's own arithmetic, including how it rounds (`Int(...)` truncates; a `NumberFormatter`
+  rounds half to even). That is not user data.
+- `.lineLimit(1)` with `.minimumScaleFactor`: keep the line on one line (`white-space:nowrap`) and
+  lower its font size just enough to fit the width left after the padding, never below size times
+  the factor. Other long text wraps.
+- Text with no color set follows the color scheme: check `.preferredColorScheme`,
+  `UIUserInterfaceStyle` in `Info.plist`, or the screen's background. On a dark screen it is white.
+- A default with `\n` in it is shown with `white-space:pre-line` and the default text as it is.
+- If the view still reads the old SDK (other keys or IDs), or reads fewer keys than Xee holds,
+  take the copy from Xee's defaults and the look from the code, and tell the person which
+  variables this build does not read yet.
+- If the version you start from already breaks a rule in A2 (translated text held as a text
+  variable, a price in a string), say so at the confirm point and offer the fix. Do not change it
+  silently in the same push.
 - Controls drawn as iOS draws them, never left out. A `Toggle` is a switch at the right end of its
   row, its label on the left (`display:flex; justify-content:space-between`), 51 by 31 with a white
-  knob, green `#34C759` with the knob right when on, gray `#E9E9EA` with the knob left when off,
+  knob, green `#34C759` (or the Toggle's `.tint`) with the knob right when on, gray `#E9E9EA` with the knob left when off,
   as its default says. A selected plan shows the view's selected border or checkmark. If a row is
   tight, the label wraps; the control keeps its size.
 
@@ -266,6 +294,10 @@ writing a style:
 - Always end `font-family` with a generic family (`sans-serif`), so the preview still reads if the
   font does not load. The dashboard's preview allows only `fonts.googleapis.com` and
   `fonts.gstatic.com`.
+
+Then call `push_paywall_version` with `app`, `paywall`, `base_version`, `html`, `products`, and
+`variables` (`key`, `type`, `default`, plus `renamed_from` where it applies), with the `html`
+built as above.
 
 - **Conflict** (`latest is N`): call `get_paywall` again, redo your change on top of the new
   version, and show the person what changed under you before pushing again.
