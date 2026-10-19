@@ -237,6 +237,20 @@ page margin. SwiftUI points are CSS pixels, so copy the view's sizes as they are
   as its default says. A selected plan shows the view's selected border or checkmark. If a row is
   tight, the label wraps; the control keeps its size.
 
+**Read what the view calls, not only the view.** The look often lives elsewhere; open it before
+writing a style:
+
+- A font helper (`.font(size:weight:)`, `.font(style:weight:)`, a `FontModifier`) maps to the
+  family and weights the app bundles. A text style is its iOS size at Large: `largeTitle` 34,
+  `title` 28, `title2` 22, `title3` 20, `headline` 17, `body` 17, `callout` 16, `subheadline` 15,
+  `footnote` 13, `caption` 12.
+- A named color (`.accent`, `Color("brand")`, `.blue1`) is in the asset catalog: read its
+  `Contents.json` for the hex. Never guess it from a screenshot or a nearby color.
+- A shared component (`MainButton`, a cell, a badge) has its own file: copy its background,
+  corner radius, height and font from there. A gradient stays a gradient, a gradient border stays one.
+- Draw the default state's real cells: the trial badge and its "cancel anytime", the per-week line
+  under a yearly price, the save badge, the footer's left and right links, in the view's order.
+
 **Font.** The only outside request allowed is Google Fonts, so the preview's type matches the app:
 
 - **Find the font the view uses**: `.font(.custom("Roboto-Bold", size:))`, `UIFont(name:)`, a
