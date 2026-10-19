@@ -158,6 +158,7 @@ Then write the plan as one table and **stop for approval**. One row per call or 
 | `<file>:<line>` | set or clear the user ID | `identify-users` | 3 | reuse the existing user ID so profiles line up |
 | `<file>:<line>` | fetch a paywall or placement | `get-paywall` | 2, 4 | old placement IDs may differ from Xee paywall IDs |
 | `<file>:<line>` | show the paywall | the app's own view, values from Xee | 2, 4 | remote-built paywall UI has no Xee counterpart: the user decides |
+| `<file>:<line>` | copy hard-coded in the paywall view | suggested new variables (phase 1, group 2) | 1, 4 | each needs code that reads it; today's literal stays the fallback |
 | `<file>:<line>` | log that the paywall was shown | `log-paywall-views` | 4 | without it tests have no viewers |
 | `<file>:<line>` | buy | `make-purchases` | 4 | pass the product object from the Xee paywall |
 | `<file>:<line>` | restore | `make-purchases` | 3, 4 | |
@@ -222,11 +223,28 @@ Goal: Xee can serve the app, with the old SDK still in charge. Nothing in the ap
         offers that Xee lacks goes back to step 2 first: a paywall's products must be in Xee.
 
      Never guess a product ID. Show the list and its source before the push.
-   - `variables`: the values the screen reads (Adapty's remote config keys, RevenueCat's
-     offering metadata, or the strings hard-coded in the view), each with today's value as its
-     default. Copy them as they are; do not rewrite copy during a migration.
+   - `variables`, in two groups. The plan shows both, and **group 2 is never left out**:
+     1. **Values the app reads today**: Adapty's remote config keys, RevenueCat's offering
+        metadata, each with today's value as its default and the line that reads it. The old
+        provider's dashboard holds the live values; ask the user to read them there.
+     2. **Suggested new variables.** Read the view and go through its hard-coded literals as
+        `paywall-tests` A2 does: headline, subhead, benefit bullets, social-proof numbers,
+        button text, badges, which plan is preselected, whether a block shows. Keep its
+        exclusions: no price, period or trial length (those come from the product), no legal
+        text or restore button, no layout. **A string the app localizes** (`String(localized:)`,
+        a `Text` literal in an app with a String Catalog or `.lproj` in more than one language)
+        becomes a selector between localized variants (`bool` or small `int`, today's text is
+        `0` or `false`), not the text, and say why. Suggest the few worth testing, about three to
+        eight, each with key, type, default, the `<file>:<line>` it comes from, and one line on
+        what a test on it could learn.
+     Every default is what the screen shows today, so the first push changes nothing users
+     see. You choose which values become variables; you do not rewrite them. New wording is a
+     test for later (`paywall-tests`). Group 2 needs code that reads each key with today's
+     literal as its fallback: put that in the plan row that loads the paywall from Xee. The
+     user picks which suggestions to keep; push only those. If the view has nothing worth a
+     variable, say so instead of an empty group.
    - `html`: a preview of the screen as the app shows it today, with `data-xee` markers on
-     the values.
+     the values of both groups.
 
    Read the `paywall-tests` rules for variable keys, types and `html` before the push. Say the
    ID out loud first: `create_paywall` makes exactly that ID, so a typo leaves a stray
@@ -393,7 +411,8 @@ Report each line as done, not done, or not checked (with how to check):
 - [ ] App in Xee, bundle ID matches, `in_app_purchase_key` is `true` (or the user knows
       existing subscribers wait for notifications).
 - [ ] Products in Xee; every paywall the code asks for exists in Xee (created in phase 1 with
-      its products, variables and HTML preview if it was missing).
+      its products, today's values, the suggested new variables the user kept, and an HTML
+      preview if it was missing).
 - [ ] Paywall content in Xee (`paywall-tests` did the push).
 - [ ] Phase 3 build: parallel access, same user ID, restore into Xee, shipped and watched.
 - [ ] Phase 4: purchase, restore and status through Xee; sandbox verification passed

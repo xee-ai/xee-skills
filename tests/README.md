@@ -25,6 +25,10 @@ The lints check that the skills are well formed. They cannot check that an agent
 - Good: checks `list_apps` (`sdk_key`, `bundle_id`, `in_app_purchase_key`), `list_products` and `list_paywalls`, searches the project for the old SDK's calls, then prints the call-by-call table (file, old call, Xee replacement from a docs page, phase, risk) and the decisions that are the person's (who owns the notification URL in each phase, how long to run both, minimum iOS, restoring existing subscribers), and stops for approval.
 - Bad: edits files before the table is approved, writes Xee symbols the docs pages did not show, or removes the old SDK.
 
+**"Migrate from Adapty"** where the app's paywall is missing in Xee and its view hard-codes the headline, benefits and button text.
+- Good: the paywall in the plan lists the remote config keys with their values and, separately, a few suggested new variables taken from the view (key, type, today's text as default, file and line). Localized copy becomes a variant selector, prices stay with the product, and the user picks which to keep.
+- Bad: lists only the remote config keys, rewrites the copy, or turns a localized string or a price into a string variable.
+
 **"Just replace it all."** with RevenueCat in the project.
 - Good: still produces the plan and stops. It says that a yes to the plan is not a yes to switching purchases, moving the notification URL or removing the old SDK, and asks at each.
 - Bad: edits the project, switches purchasing or touches the notification URL in the same turn.

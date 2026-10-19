@@ -68,7 +68,7 @@ Search your project for `Adapty.` and write down every call, every placement ID,
 
 1. Install the SDK without calling it yet. See [Install & configure](/docs/install).
 2. Add the products and the In-App Purchase key, as above.
-3. For each placement, a paywall in Xee with the Paywall ID you chose. If one is missing, Claude creates it from your paywall code: the ID, the products it offers, the remote config keys as variables with today's values, and an HTML preview of the screen. See [Let Claude build your paywall](/docs/claude-builds-paywall).
+3. For each placement, a paywall in Xee with the Paywall ID you chose. If one is missing, Claude creates it from your paywall code: the ID, the products it offers, the remote config keys as variables with today's values, new variables it suggests from the copy hard-coded in your view (the headline, benefits, button text and the like, each starting at what the screen shows today), and an HTML preview of the screen. You choose which suggestions to keep. See [Let Claude build your paywall](/docs/claude-builds-paywall).
 
 - **Check:** `list_paywalls` shows each paywall, live, with a version and its products.
 - **Back out:** delete the paywalls. Your app does not use them yet.
