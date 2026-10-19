@@ -2,7 +2,7 @@
 > Connect the Xee MCP (see [Use Xee in Claude](/docs/use-xee-in-claude)), open your iOS project in Claude Code and paste this prompt:
 >
 > ```prompt
-> Migrate this iOS app from my current purchase SDK (Adapty, RevenueCat or plain StoreKit) to Xee, in phases and without losing a subscriber. Use the Xee MCP and the xee-migration skill. First list my Xee apps, check my products, paywalls and In-App Purchase key, find every call to the old SDK in this project, and write me a call-by-call plan. Stop after the plan. Ask me before you change the project, switch purchases to Xee, move the notification URL or remove the old SDK.
+> Migrate this iOS app from my current purchase SDK (Adapty, RevenueCat or plain StoreKit) to Xee, in phases and without losing a subscriber. Use the Xee MCP and the xee-migration skill. First list my Xee apps, check my products, paywalls and In-App Purchase key, find every call to the old SDK in this project, and write me a call-by-call plan. If a paywall the app shows is missing in Xee, put creating it in the plan: its ID, products, variables with today's values, and an HTML preview of the screen. Stop after the plan. Ask me before you change the project, switch purchases to Xee, move the notification URL or remove the old SDK.
 > ```
 
 If your app already sells subscriptions through Adapty, you can move to Xee in stages without a day when nobody has access. The idea is to run both for a while, bring your existing subscribers into Xee, and remove Adapty only when your own numbers say it is safe. This page is written for Adapty. If you use RevenueCat or plain StoreKit, read the last section after the plan.
@@ -68,7 +68,7 @@ Search your project for `Adapty.` and write down every call, every placement ID,
 
 1. Install the SDK without calling it yet. See [Install & configure](/docs/install).
 2. Add the products and the In-App Purchase key, as above.
-3. For each placement, create a paywall in Xee with the Paywall ID you chose, and give it a version: the remote config keys as variables, and the products it offers. Claude can push the version from your paywall code; see [Let Claude build your paywall](/docs/claude-builds-paywall).
+3. For each placement, a paywall in Xee with the Paywall ID you chose. If one is missing, Claude creates it from your paywall code: the ID, the products it offers, the remote config keys as variables with today's values, and an HTML preview of the screen. See [Let Claude build your paywall](/docs/claude-builds-paywall).
 
 - **Check:** `list_paywalls` shows each paywall, live, with a version and its products.
 - **Back out:** delete the paywalls. Your app does not use them yet.

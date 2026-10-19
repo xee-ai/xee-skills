@@ -96,10 +96,12 @@ skill does not, the page wins; say so.
 | `list_products`, `get_product` | Which products Xee has, and one product's status against App Store Connect. |
 | `create_product`, `sync_products` | Add a product to Xee, or read the products from App Store Connect into Xee. Only after a confirm. Neither creates anything in App Store Connect. |
 | `list_paywalls`, `get_paywall` | Paywall IDs, whether each is live, version, variables and products. |
+| `push_paywall_version` | Create a paywall the code asks for but Xee lacks: a first version (`base_version` 0) under the new ID, with its products, variables and an HTML preview. Only after a confirm (phase 1). |
 | `list_docs`, `get_doc` | The docs, as above. |
 
-`push_paywall_version`, `propose_test`, `get_test_results` and `edit_product` belong to
-`paywall-tests` and to product upkeep. Do not use them here; hand over (phase 2).
+`propose_test`, `get_test_results` and `edit_product` belong to `paywall-tests` and to product
+upkeep. Do not use them here. Use `push_paywall_version` only to create a missing paywall
+(phase 1); later versions belong to `paywall-tests` (phase 2).
 
 **If there are no Xee tools** (no `list_apps`, no `get_doc`), the `xee` MCP server is not
 connected. Say so in one short message, point to the docs page `use-xee-in-claude`
@@ -122,7 +124,8 @@ put the token in code, in a file in the project, or in a message.
    under In-App Purchase; the `refund-saver` page has the steps). Never ask for the `.p8`
    file.
 4. `list_products` and `list_paywalls`. Compare with what the old SDK sells (inventory). Note
-   products the old SDK sells that Xee lacks, and old placements with no paywall in Xee.
+   products the old SDK sells that Xee lacks, and old placements with no paywall in Xee. You
+   create those paywalls in phase 1; put them in the plan.
 
 ## Phase 0: Inventory and plan (You, read-only)
 
@@ -192,7 +195,19 @@ Goal: Xee can serve the app, with the old SDK still in charge. Nothing in the ap
    App Store Connect API key is added in Xee, else `create_product` (it adds the product to
    Xee only). Say out loud that neither creates it in App Store Connect; the products already
    exist there.
-3. **User:** paywalls Xee needs exist (Paywalls, Create paywall) with the IDs from the plan.
+3. **You, after a confirm:** every paywall the code asks for exists in Xee. For an old placement
+   with no Xee paywall, create it by pushing a first version with `push_paywall_version`,
+   `base_version` 0, under the paywall ID from the plan:
+   - `products`: the product IDs that placement offers today (in Xee since step 2).
+   - `variables`: the values the screen reads (Adapty's remote config keys, RevenueCat's
+     offering metadata, or the strings hard-coded in the view), each with today's value as its
+     default. Copy them as they are; do not rewrite copy during a migration.
+   - `html`: a preview of the screen as the app shows it today, with `data-xee` markers on
+     the values.
+
+   Read the `paywall-tests` rules for variable keys, types and `html` before the push. Say the
+   ID out loud first: a push under an unknown ID creates a paywall, so a typo leaves a stray
+   one. Then read it back with `get_paywall`.
 
 **Back-out:** none needed; the app is untouched.
 
@@ -200,8 +215,9 @@ Goal: Xee can serve the app, with the old SDK still in charge. Nothing in the ap
 
 Goal: the paywall's copy, values and products are in Xee, ready for the new screen.
 
-Offer: "I can move your paywall's text and values into Xee so you can change and test them
-without a release. Want me to?" On a yes, hand to `paywall-tests` (it owns variables, `html`,
+A paywall you created in phase 1 already has its content: skip it here. For a paywall that
+already existed in Xee, offer: "I can move your paywall's text and values into Xee so you can
+change and test them without a release. Want me to?" On a yes, hand to `paywall-tests` (it owns variables, `html`,
 `base_version` and the push) with the paywall as the old SDK shows it today. Copy the live copy
 as it is; do not edit wording during a migration. A push does not change what users see yet:
 the old SDK still serves its own paywall.
@@ -353,7 +369,8 @@ Report each line as done, not done, or not checked (with how to check):
 - [ ] Inventory done; the user approved the call-by-call plan and the five decisions.
 - [ ] App in Xee, bundle ID matches, `in_app_purchase_key` is `true` (or the user knows
       existing subscribers wait for notifications).
-- [ ] Products in Xee; paywall IDs match what the code asks for.
+- [ ] Products in Xee; every paywall the code asks for exists in Xee (created in phase 1 with
+      its products, variables and HTML preview if it was missing).
 - [ ] Paywall content in Xee (`paywall-tests` did the push).
 - [ ] Phase 3 build: parallel access, same user ID, restore into Xee, shipped and watched.
 - [ ] Phase 4: purchase, restore and status through Xee; sandbox verification passed
