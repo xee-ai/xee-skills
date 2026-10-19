@@ -217,8 +217,20 @@ stops the headline test; no winner is applied"); and the production sentence fro
 Then call `push_paywall_version` with `app`, `paywall`, `base_version`, `html`, `products`, and
 `variables` (`key`, `type`, `default`, plus `renamed_from` where it applies). Build `html` as a
 static, self-contained preview of the view (inline styles, no scripts, no user data), with
-`data-xee` on every element that shows a variable. The only outside request allowed is Google
-Fonts, so the preview's type matches the app:
+`data-xee` on every element that shows a variable.
+
+**Size and state.** The dashboard shows `html` in a 390 by 844 frame, one iPhone screen, with no
+page margin. SwiftUI points are CSS pixels, so copy the view's sizes as they are.
+
+- Fluid width: the root is `width:100%` and `min-height:100vh` with `box-sizing:border-box`, never
+  a fixed pixel width. Long text wraps instead of running off the edge.
+- One screen, no scrolling, the way the view fits on the phone. If the real view scrolls, show
+  what is visible before the user scrolls.
+- One state: what most users see today, each variable at its default. A variant selector marks
+  the element that shows variant `0`; do not stack the variants. A block that shows only in one
+  state (trial on or off, a skip button after a delay) is shown as it is at its default.
+
+**Font.** The only outside request allowed is Google Fonts, so the preview's type matches the app:
 
 - **Find the font the view uses**: `.font(.custom("Roboto-Bold", size:))`, `UIFont(name:)`, a
   font modifier or theme the view calls, the files under `UIAppFonts` in `Info.plist`.
