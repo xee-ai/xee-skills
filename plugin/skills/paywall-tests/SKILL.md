@@ -229,6 +229,11 @@ page margin. SwiftUI points are CSS pixels, so copy the view's sizes as they are
 - One state: what most users see today, each variable at its default. A variant selector marks
   the element that shows variant `0`; do not stack the variants. A block that shows only in one
   state (trial on or off, a skip button after a delay) is shown as it is at its default.
+- Controls drawn as iOS draws them, never left out. A `Toggle` is a switch at the right end of its
+  row, its label on the left (`display:flex; justify-content:space-between`), 51 by 31 with a white
+  knob, green `#34C759` with the knob right when on, gray `#E9E9EA` with the knob left when off,
+  as its default says. A selected plan shows the view's selected border or checkmark. If a row is
+  tight, the label wraps; the control keeps its size.
 
 **Font.** The only outside request allowed is Google Fonts, so the preview's type matches the app:
 
