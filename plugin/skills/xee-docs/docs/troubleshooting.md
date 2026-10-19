@@ -6,7 +6,6 @@ Set the level when you build the configuration, so it applies from the first cal
 
 ```swift snippet="troubleshooting-verbose-configuration"
 let configuration = XeeConfiguration.builder(withAPIKey: "xee_YOUR_SDK_KEY")
-    .with(serverUrl: URL(string: "{{server}}")!)
     .with(logLevel: .verbose)
     .build()
 ```
@@ -167,7 +166,7 @@ These pass on the code StoreKit gave. Read `originalError` for Apple's full erro
 | `notActivated` | 2002 | The SDK is not activated yet, or the server refused the SDK key (401 or 403). See above. |
 | `badRequest` | 2003 | The server answered with a 4xx, for example 404 when a paywall is not found or not live, or 409 when `identify` is refused. |
 | `serverError` | 2004 | The server answered with a 5xx or 429. Retry later, and check the server's logs. |
-| `networkFailed` | 2005 | The request did not get through: no connection, a timeout, or a wrong server URL. On a device, also an app with no `.with(serverUrl:)`: its default, `http://localhost:7010`, is the server on your Mac and only the Simulator reaches it. |
+| `networkFailed` | 2005 | The request did not get through: no connection, a timeout, or a wrong server URL. If you set `.with(serverUrl:)`, check that the device can reach that address: a server on your Mac is reachable from the Simulator only. |
 | `decodingFailed` | 2006 | The SDK could not read a response or a stored file. |
 | `encodingFailed` | 2009 | The SDK could not build a request. |
 

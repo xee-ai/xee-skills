@@ -42,7 +42,6 @@ If the user is signed in when the app starts, put their ID and token in the conf
 ```swift snippet="identify-at-activation"
 let configuration = XeeConfiguration
     .builder(withAPIKey: "xee_YOUR_SDK_KEY")
-    .with(serverUrl: URL(string: "{{server}}")!)
     .with(customerUserId: user.id, withAppAccountToken: user.appAccountToken)
     .build()
 

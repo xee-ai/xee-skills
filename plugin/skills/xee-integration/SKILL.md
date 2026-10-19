@@ -140,10 +140,10 @@ App settings, iOS SDK.
 app's `sdk_key` (starts with `xee_`) and `server_url`. Use them: write the real `sdk_key` into the
 activation code, never the `xee_YOUR_SDK_KEY` placeholder from the docs. If `sdk_key` is null,
 say so and tell the user to open App settings, iOS SDK in the dashboard and paste it; do not leave a
-placeholder and say the work is done. Without `.with(serverUrl:)`
-the SDK talks to `http://localhost:7010`, the Xee server on the developer's Mac. That only
-works in the Simulator, with a server running on the same Mac. A device and a release build
-need `.with(serverUrl:)` set to the real HTTPS server.
+placeholder and say the work is done. Without `.with(serverUrl:)` the SDK talks to the hosted
+Xee server, `https://api.xee.ai`, so the key alone is enough. Add `.with(serverUrl:)` only when
+the developer runs a different server; one on their Mac works only in the Simulator, and a
+release build needs an HTTPS address.
 
 The SDK key is **public**: it is made to ship inside the app. Say so when you put it in the
 code. If it ever leaks where it should not, it can be rotated on the same tab, and the new
@@ -161,9 +161,8 @@ yet) to the <target> target and add an activation call at launch. This changes
   three Xcode clicks (File, Add Package Dependencies, paste the URL, rule Branch `main`,
   add `Xee` to the target) and wait.
 - Activate once per launch, as early as possible, exactly as the current `install` page
-  shows: `Xee.activate(withAPIKey:)` for the key alone, or a configuration with
-  `.with(serverUrl:)` and `Xee.activate(with:)` when the app runs on a device or needs
-  options. A second `activate` throws. Wait for activation to finish before any other Xee
+  shows: `Xee.activate(withAPIKey:)` for the key alone, or a configuration and
+  `Xee.activate(with:)` when the app needs options (a different server, a user ID, observer mode). A second `activate` throws. Wait for activation to finish before any other Xee
   call.
 - Keep the app usable if activation fails (log the error, do not crash).
 - Use verbose logging while developing, and say it must be lowered for release.
@@ -331,7 +330,7 @@ Go through it and report each line as done, not done, or not checked (with how t
 
 - [ ] Project is iOS (Swift); no conflicting purchase SDK, or the user chose to hand over to `xee-migration`.
 - [ ] `Xee` package added to the app target; project builds.
-- [ ] Activated once at launch with the app's SDK key, and with the server URL set by `.with(serverUrl:)` for any device or release build.
+- [ ] Activated once at launch with the app's SDK key, and with `.with(serverUrl:)` set only for a different server, and to an HTTPS address in a release build.
 - [ ] Users identified, or the user knows access will not follow them across devices.
 - [ ] `in_app_purchase_key` is `true`, or the user knows access then waits for notifications.
 - [ ] Products exist in App Store Connect and in Xee (`list_products`).

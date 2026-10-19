@@ -177,9 +177,9 @@ verdict.
 Two different readers need to reach the server, and they need different things.
 
 - **The app (the SDK)** must reach it for anything to work. From the code, find the server
-  URL (step 5). No `.with(serverUrl:)` means the SDK's default, `http://localhost:7010`,
-  which works only in the Simulator against a server on the same Mac. A device needs the
-  server's real address.
+  URL (step 5). No `.with(serverUrl:)` means the SDK's default, the hosted server at
+  `https://api.xee.ai`. A `.with(serverUrl:)` that points at a server on the developer's Mac
+  works only in the Simulator; a device needs a real HTTPS address.
 - **Apple** must reach it to deliver notifications: renewals, expiry, cancellation, refunds.
   `http://`, `localhost`, `127.0.0.1` or a private address means Apple cannot. A tunnel (or
   public HTTPS) is needed for that, and its address becomes the base of the notification
@@ -198,7 +198,7 @@ Read the code; do not ask the user what it does. Search for and check:
 | Look for | A problem looks like |
 |---|---|
 | `Xee.activate(withAPIKey:)` or `XeeConfiguration.builder(withAPIKey:)` | key missing, a placeholder such as `xee_YOUR_SDK_KEY`, or not the app's `sdk_key` from `list_apps` (without the MCP, ask the user to compare the first characters with App settings, iOS SDK) |
-| `.with(serverUrl:)` | absent (the SDK then talks to `http://localhost:7010`, which only works in the Simulator against a server running on the same Mac; on a device it fails), `http://`, or a local address |
+| `.with(serverUrl:)` | `http://`, or a local address (works only in the Simulator, so on a device it fails). Absent is fine: the SDK then uses `https://api.xee.ai` |
 | `Xee.activate(withAPIKey:)` or `Xee.activate(with:)` | called more than once, or other SDK calls made before it finished |
 | `.with(observerMode: true)` | purchases through the SDK are then unavailable |
 | `Xee.getPaywallVariant(paywallId:)` | the ID differs from `list_paywalls` by case or a typo |
@@ -283,7 +283,7 @@ none; fetch `troubleshooting` for the full table):
 |---|---|---|
 | `notActivated` (2002) | called before `activate` finished, or the server refused the SDK key (401/403) | code |
 | `badRequest` (2003) on a paywall | wrong paywall ID, paywall not live, no version, or key from another app | Xee dashboard or code |
-| `networkFailed` (2005) | no connection, timeout, a wrong server URL, or the default `http://localhost:7010` on a device | code, or the server is down |
+| `networkFailed` (2005) | no connection, timeout, a wrong server URL, or a `.with(serverUrl:)` that points at a server on the developer's Mac, used on a device | code, or the server is down |
 | `noProductIDsFound` (1000) | StoreKit returned none of the paywall's products | Xee dashboard or App Store Connect |
 | `cantMakePayments` (1003) | purchases blocked on the device, or observer mode | phone, or code |
 | `productPurchaseFailed` (1006) | read `originalError`, usually a StoreKit code 0 to 14 | depends on the original error |

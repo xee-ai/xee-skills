@@ -37,13 +37,13 @@ Open App settings, iOS SDK in the Xee dashboard. The **SDK** section shows:
 | Value | What it is |
 | --- | --- |
 | SDK key | The public key for this app. It starts with `xee_`. |
-| Server URL | The address of your Xee server, `{{server}}`. Set it with `.with(serverUrl:)` to send the SDK's requests there. |
+| Server URL | The address of the Xee server, `{{server}}`. The SDK uses `https://api.xee.ai` unless you set `.with(serverUrl:)`, so set it only to send requests to a different server. |
 | Notification URL | Where Apple sends App Store Server Notifications for this app: renewals, expiry, cancellations and refunds. |
 
 Each app in Xee has its own SDK key, so pick the right app if you have several. If Claude does the integration through the Xee MCP, it reads the key, the bundle ID and the server address for you with `list_apps`, so you do not have to paste them. The key is public: it is meant to ship inside your app. If it leaks somewhere you did not intend, rotate it on the same tab and ship the new one.
 
 > [!IMPORTANT]
-> Without `.with(serverUrl:)` the SDK talks to `http://localhost:7010`, the Xee server running on your Mac. That works in the iOS Simulator while the server runs on the same Mac. A real device cannot reach `localhost` on your Mac, so on a device, and in every release build, set `.with(serverUrl:)` to your real server over HTTPS. A local server is enough to unlock purchases, because it is your server that calls Apple, but Apple's notifications reach only a server on a public HTTPS address.
+> The SDK talks to the Xee server at `https://api.xee.ai` unless you set `.with(serverUrl:)`. Set it only to use a different server, such as one you run on your Mac while you develop: the iOS Simulator can reach it, a real device cannot. Use an HTTPS address in every release build.
 
 ## Activate the SDK
 
@@ -110,12 +110,11 @@ Xee.activate(withAPIKey: "xee_YOUR_SDK_KEY") { error in
 
 ### Activate with a configuration
 
-When you need more than the key, build an `XeeConfiguration` and call `Xee.activate(with:)`. The builder sets the server URL, the log level, the customer user ID and app account token, observer mode and the other options under **Optional setup** below. This example sends requests to your server and turns on verbose logs:
+When you need more than the key, build an `XeeConfiguration` and call `Xee.activate(with:)`. The builder sets the server URL, the log level, the customer user ID and app account token, observer mode and the other options under **Optional setup** below. This example turns on verbose logs:
 
 ```swift snippet="activate-with-configuration"
 let configuration = XeeConfiguration
     .builder(withAPIKey: "xee_YOUR_SDK_KEY")
-    .with(serverUrl: URL(string: "{{server}}")!)
     .with(logLevel: .verbose) // for development; remove or lower for release
     .build()
 
@@ -175,7 +174,6 @@ By default the SDK collects the advertising identifier (IDFA) and the device's I
 ```swift snippet="data-collection"
 let configuration = XeeConfiguration
     .builder(withAPIKey: "xee_YOUR_SDK_KEY")
-    .with(serverUrl: URL(string: "{{server}}")!)
     .with(idfaCollectionDisabled: true)
     .with(ipAddressCollectionDisabled: true)
     .build()

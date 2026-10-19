@@ -14,8 +14,7 @@ const skip = /\.(png|jpg|svg)$|lint-secrets\.mjs$/;
 const problems = [];
 for (const f of walk()) {
   if (skip.test(f)) continue;
-  // The SDK's documented default server is not a leak; every other local address is still flagged.
-  const text = readFileSync(f, "utf8").replaceAll(/http:\/\/localhost:7010(?!\d)/g, "");
+  const text = readFileSync(f, "utf8");
   for (const [re, what] of rules) if (re.test(text)) problems.push(`${rel(f)}: contains ${what}`);
 }
 finish("secrets", problems);

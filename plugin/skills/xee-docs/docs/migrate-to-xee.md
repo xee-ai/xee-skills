@@ -6,7 +6,7 @@ The calls map almost one to one. The access level `premium`, the profile and the
 
 | Adapty | Xee |
 | --- | --- |
-| `Adapty.activate`, `Adapty.identify` | `Xee.activate(with:)` with `.with(serverUrl:)`, and `Xee.identify(_:withAppAccountToken:)` or the same values in the configuration. |
+| `Adapty.activate`, `Adapty.identify` | `Xee.activate(with:)`, and `Xee.identify(_:withAppAccountToken:)` or the same values in the configuration. |
 | `Adapty.getProfile()` | `Xee.getProfile()`. Read `profile.accessLevels["premium"]?.isActive`, as before. |
 | `profile.subscriptions` | `profile.subscriptions`, keyed by product ID, with an entry for every subscription Xee has recorded, expired ones included. |
 | `Adapty.getPaywall(placementId:)` | `Xee.getPaywallVariant(paywallId:)`. A placement ID becomes a paywall ID you create in Xee. |
@@ -22,7 +22,7 @@ What differs:
 - Xee has one access level, `premium`. Every product in Xee unlocks it.
 - Xee has no paywall builder. Your paywall stays your own view and Xee holds its values and products. See [Get a paywall and its values](/docs/get-paywall).
 - Access comes from Apple, checked by your server. Xee asks Apple about a purchase or a restore with your In-App Purchase key, and the rest arrives in Apple's notifications. See [Make purchases](/docs/make-purchases).
-- You run the server. Adapty's SDK talks to Adapty's cloud; Xee's talks to the one in `.with(serverUrl:)`.
+- Adapty's SDK talks to Adapty's cloud; Xee's talks to the Xee server, `https://api.xee.ai`.
 
 Here is the Adapty code the rest of this page replaces:
 
@@ -73,7 +73,6 @@ Adapty still sells. Your paywall now reads its values and its product list from 
 ```swift title="Activate beside Adapty" snippet="migrate-activate"
 let configuration = XeeConfiguration
     .builder(withAPIKey: "xee_YOUR_SDK_KEY")
-    .with(serverUrl: URL(string: "{{server}}")!)
     .with(customerUserId: user.id, withAppAccountToken: user.appAccountToken)
     .with(observerMode: true) // While Adapty still sells. Remove this line when Xee takes over purchases.
     .build()
