@@ -15,7 +15,7 @@ Xee does not take the app's word for a purchase. When the SDK reports a test pur
 
 The first purchase unlocks without it when the In-App Purchase key is set. Set it so renewals, expiry, cancellations and refunds reach Xee too.
 
-1. In Xee, open App settings, iOS SDK and copy the **Notification URL**. It looks like `{{server}}/v1/notifications/apple/your-app-id`.
+1. In Xee, open App settings, iOS SDK and copy the **Notification URL**. It looks like `{{server}}/v1/notifications/apple/your-notification-id`.
 2. In App Store Connect, open your app, then App Information, App Store Server Notifications.
 3. Paste the URL for both **Production Server URL** and **Sandbox Server URL**, and choose **Version 2** for each.
 
