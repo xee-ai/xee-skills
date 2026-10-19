@@ -99,6 +99,7 @@ Say the app and paywall by the IDs you see in the dashboard. A few to start with
 | `get_app` | One app's setup values: the same as its entry in `list_apps`, `in_app_purchase_key` included. |
 | `list_paywalls` | An app's paywalls, with whether each is live and its latest version. |
 | `get_paywall` | The latest version of a paywall: its variables with their current values, its products, and the test running on it. |
+| `create_paywall` | Creates an empty paywall with the ID the app will ask for and a name for the dashboard. Claude then gives it a first version with `push_paywall_version`. |
 | `push_paywall_version` | Sends a new version after Claude changes the paywall view: an HTML preview with `data-xee` markers, the products and the variables. |
 | `list_products` | The app's product catalogue, for choosing which products a paywall shows. |
 | `get_product` | One product: what Xee keeps, and its status, US price and display names from App Store Connect. |

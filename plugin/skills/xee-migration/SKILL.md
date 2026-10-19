@@ -96,12 +96,12 @@ skill does not, the page wins; say so.
 | `list_products`, `get_product` | Which products Xee has, and one product's status against App Store Connect. |
 | `create_product`, `sync_products` | Add a product to Xee, or read the products from App Store Connect into Xee. Only after a confirm. Neither creates anything in App Store Connect. |
 | `list_paywalls`, `get_paywall` | Paywall IDs, whether each is live, version, variables and products. |
-| `push_paywall_version` | Create a paywall the code asks for but Xee lacks: a first version (`base_version` 0) under the new ID, with its products, variables and an HTML preview. Only after a confirm (phase 1). |
+| `create_paywall`, `push_paywall_version` | Create a paywall the code asks for but Xee lacks, then give it a first version (`base_version` 0) with its products, variables and an HTML preview. Only after a confirm (phase 1). |
 | `list_docs`, `get_doc` | The docs, as above. |
 
 `propose_test`, `get_test_results` and `edit_product` belong to `paywall-tests` and to product
-upkeep. Do not use them here. Use `push_paywall_version` only to create a missing paywall
-(phase 1); later versions belong to `paywall-tests` (phase 2).
+upkeep. Do not use them here. Use `create_paywall` and `push_paywall_version` only to create a
+missing paywall (phase 1); later versions belong to `paywall-tests` (phase 2).
 
 **If there are no Xee tools** (no `list_apps`, no `get_doc`), the `xee` MCP server is not
 connected. Say so in one short message, point to the docs page `use-xee-in-claude`
@@ -198,9 +198,9 @@ Goal: Xee can serve the app, with the old SDK still in charge. Nothing in the ap
    Xee only). Say out loud that neither creates it in App Store Connect; the products already
    exist there.
 3. **You, after a confirm:** every paywall the code asks for exists in Xee. For an old placement
-   with no Xee paywall, create it by pushing a first version with `push_paywall_version`,
-   `base_version` 0. There is no separate create tool: this first push creates the paywall,
-   and it then appears under Paywalls in the dashboard.
+   with no Xee paywall, create it with `create_paywall` (the ID below, and a name for the
+   dashboard, such as the old placement's name), then push its first version with
+   `push_paywall_version`, `base_version` 0. It appears under Paywalls in the dashboard.
    - **ID**, in this order:
      1. The old SDK's own ID for that screen: Adapty's placement ID (the string passed to
         `Adapty.getPaywall(placementId:)`), RevenueCat's offering identifier, or the like.
@@ -229,8 +229,8 @@ Goal: Xee can serve the app, with the old SDK still in charge. Nothing in the ap
      the values.
 
    Read the `paywall-tests` rules for variable keys, types and `html` before the push. Say the
-   ID out loud first: a push under an unknown ID creates a paywall, so a typo leaves a stray
-   one. Then read it back with `get_paywall`.
+   ID out loud first: `create_paywall` makes exactly that ID, so a typo leaves a stray
+   paywall. Then read it back with `get_paywall`.
 
 **Back-out:** none needed; the app is untouched.
 

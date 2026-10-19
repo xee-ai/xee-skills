@@ -112,7 +112,8 @@ shows today, which is the version live subscribers know. Do not change the copy 
 ### A1. Find and read
 
 1. `list_paywalls`. If the paywall the person means is not listed, ask whether they want a new one.
-   Never let a typo create a paywall: pushing with `base_version` 0 under an unknown ID creates it.
+   For a new one, confirm the ID and name, then `create_paywall`. Never let a typo create a
+   paywall: `create_paywall`, or a push with `base_version` 0 under an unknown ID, creates it.
 2. `get_paywall` for the existing one. Keep `version`, every variable (`default` and `current`),
    `products`, and `running_test`. Also call `get_test_results` and note any test with status
    `draft`: a draft made on an older version cannot be started after a push, so the person would

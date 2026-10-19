@@ -94,6 +94,7 @@ The `xee` MCP server. Real tools only:
 | `create_product` | Add a product to **Xee** (USD price, period, access `premium`). It does **not** create it in App Store Connect. |
 | `sync_products` | Read the products from App Store Connect into Xee, for the app or one product. |
 | `list_paywalls`, `get_paywall` | See paywall IDs, whether each is live, its latest version, variables and products. |
+| `create_paywall` | Create an empty paywall (ID and name). Only in the paywall stage, only after confirmation. |
 | `push_paywall_version` | Send a paywall version (HTML preview, products, variables). Only in the paywall stage, only after confirmation. |
 
 `edit_product`, `get_test_results` and `propose_test` exist but belong to `paywall-tests` and
@@ -221,7 +222,9 @@ to `use-xee-in-claude` ("Which Apple key edits products") rather than guessing.
 (for example `main`, set in the dashboard and unchangeable) and at least one version, and it
 must be live; the SDK throws for an unknown, inactive or version-less paywall.
 
-- If none exists yet, the user creates it in the dashboard (Paywalls, Create paywall).
+- If none exists yet, offer to create it: say the ID (`main`, or what the screen is for) and the
+  name, and on a yes call `create_paywall`. The user can also make it in the dashboard
+  (Paywalls, Create paywall). A new paywall has no version until the push below.
 - To give it a version with variables, offer: "I can move your paywall's text and toggles
   into Xee so you can change and test them without a release." That is `claude-builds-paywall`.
   Fetch it, then **stop and confirm** the list of variables and products before calling
@@ -319,7 +322,7 @@ sandbox account, tap restore.
 - Never remove or replace an existing purchase SDK here: that is `xee-migration`, and only
   after an explicit yes at that step.
 - Never ask for, open or paste an Apple `.p8` key. The user adds it in the dashboard.
-- Never run `push_paywall_version`, `create_product` or `sync_products`, or edit project
+- Never run `create_paywall`, `push_paywall_version`, `create_product` or `sync_products`, or edit project
   files broadly, without the confirm described above.
 - Never start a test. Suggesting is `paywall-tests`; starting is the user's, in the dashboard.
 - Never leave verbose logging or a tunnel/local server URL in a release build.

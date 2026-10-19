@@ -5,6 +5,7 @@ list_docs
 get_doc
 list_paywalls
 get_paywall
+create_paywall
 push_paywall_version
 list_products
 get_product

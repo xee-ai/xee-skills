@@ -5,7 +5,7 @@ Your paywall stays a normal SwiftUI view in your app. Xee keeps a copy of the va
 
 ## How a change goes
 
-1. Claude finds the paywall with `list_paywalls`, then reads it with `get_paywall`. A paywall that does not exist yet is an error that lists the ones there are; Claude creates a new one by pushing with `base_version` 0.
+1. Claude finds the paywall with `list_paywalls`, then reads it with `get_paywall`. A paywall that does not exist yet is an error that lists the ones there are; Claude creates a new one with `create_paywall`, then pushes its first version with `base_version` 0.
 2. It changes the view in your project. Every value that should be testable becomes a variable, and the value Xee holds today becomes its default in the Swift code.
 3. It sends the new version with `push_paywall_version`: an HTML preview of the view, the products, and the variables.
 4. The version appears on the paywall's page in the dashboard, with the preview. You can start a test on any marked value there.
