@@ -20,7 +20,7 @@ The calls map almost one to one. The access level `premium`, the profile and the
 What differs:
 
 - Xee has one access level, `premium`. Every product in Xee unlocks it.
-- Xee has no paywall builder. Your paywall stays your own view and Xee holds its values and products. See [Get a paywall and its values](/docs/get-paywall).
+- Your paywall stays your own view. Xee holds its values and products. See [Get a paywall and its values](/docs/get-paywall).
 - Access comes from Apple, checked by your server. Xee asks Apple about a purchase or a restore with your In-App Purchase key, and the rest arrives in Apple's notifications. See [Make purchases](/docs/make-purchases).
 - Adapty's SDK talks to Adapty's cloud; Xee's talks to the Xee server, `https://api.xee.ai`.
 
