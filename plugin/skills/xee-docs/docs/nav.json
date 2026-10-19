@@ -8,6 +8,7 @@
   ] },
   { "section": "Paywalls", "pages": [
     { "slug": "get-paywall", "nav": "Get a paywall and its values", "title": "Get a paywall and its values" },
+    { "slug": "paywall-design", "nav": "Save the design and values", "title": "Save your paywall's design and values" },
     { "slug": "log-paywall-views", "nav": "Log paywall views", "title": "Log paywall views" },
     { "slug": "ab-tests", "nav": "A/B tests", "title": "A/B tests" }
   ] },
