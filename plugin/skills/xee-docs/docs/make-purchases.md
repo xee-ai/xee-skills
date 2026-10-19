@@ -7,12 +7,12 @@ Your paywall is your own view, so the purchase starts in your code: when the use
 
 When the SDK reports a purchase, Xee asks Apple about it: "Get All Subscription Statuses" of the App Store Server API, signed with the app's In-App Purchase key. Xee verifies Apple's signed answer against Apple's root certificates and your bundle ID, and records the subscriptions for the profile. `makePurchase` returns after that, so the profile in a successful result already shows `premium`.
 
-- **A local server works.** The server calls Apple, so Apple does not need to reach it. Notifications are not needed for a purchase to unlock.
-- **Notifications still carry what happens later.** Renewals, expiry, cancellation, grace period and billing retry, refunds and refund-saver requests arrive while the app may be closed, and only Apple's notifications bring them. Keep the notification URL set up and your server reachable over HTTPS.
+- **Notifications are not needed for a purchase to unlock.** The check above is enough.
+- **Notifications still carry what happens later.** Renewals, expiry, cancellation, grace period and billing retry, refunds and refund-saver requests arrive while the app may be closed, and only Apple's notifications bring them. Keep the notification URL set up in App Store Connect.
 - **Without the key, nothing is asked of Apple.** Access then waits for the notification for that purchase. It usually comes within seconds but can arrive after `makePurchase` returns, so the profile in the result may not show `premium` yet. Refresh it with `Xee.getProfile()` until it does, as in the examples below.
 - **Production first, then sandbox.** When the SDK does not say which environment a transaction is from, Xee asks Apple's production servers and then the sandbox.
 - **StoreKit testing in Xcode never unlocks.** Transactions from a StoreKit configuration file do not exist at Apple, so they are never sent and never unlock anything.
-- **A failed check never fails your call.** If Apple cannot be reached, answers an error, or its answer does not verify, `makePurchase` still succeeds and the profile comes back as it stands. The failure is in your server's log, and the notification or a later `Xee.restorePurchases()` brings the access.
+- **A failed check never fails your call.** If Apple cannot be reached, answers an error, or its answer does not verify, `makePurchase` still succeeds and the profile comes back as it stands. The failure is in Xee's log, and the notification or a later `Xee.restorePurchases()` brings the access.
 
 Each verified check shows on the Events page as `VERIFIED_WITH_APPLE`. It counts no revenue: revenue comes from Apple's own notifications.
 

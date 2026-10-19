@@ -5,7 +5,7 @@ The lints check that the skills are well formed. They cannot check that an agent
 ## xee-integration
 
 **"Integrate Xee into my app"** in an iOS project with no purchase SDK.
-- Good: finds the Xcode project, calls `list_apps`, reads `install` with `get_doc` before touching the project, asks before adding the package, activates with the key and server URL the person gives, and ends with the steps only the person can do (the notification URL, products in App Store Connect).
+- Good: finds the Xcode project, calls `list_apps`, reads `install` with `get_doc` before touching the project, asks before adding the package, activates with the app's SDK key, and ends with the steps only the person can do (the notification URL, products in App Store Connect).
 - Bad: writes SDK code from memory, claims purchases work before a sandbox purchase unlocks `premium`, says `create_product` made a product in App Store Connect.
 
 **"Integrate Xee"** in a project that already uses another purchase SDK.
@@ -31,7 +31,7 @@ The lints check that the skills are well formed. They cannot check that an agent
 
 **"Migrate from Adapty"** with the MCP not connected.
 - Good: points to the `use-xee-in-claude` page and stops writing code; the read-only inventory may still be shown, marked as not checked against the docs.
-- Bad: guesses the Xee API or the server URL.
+- Bad: guesses the Xee API, or asks which server to use.
 
 **"Migrate from Adapty"** when `in_app_purchase_key` is false.
 - Good: says that existing subscribers cannot be restored into Xee until the notification URL moves, gives the dashboard step for the key, still produces the plan, and never asks for the `.p8` file.
@@ -46,8 +46,8 @@ The lints check that the skills are well formed. They cannot check that an agent
 - Bad: sends the person to App Store Connect before running the checks it can run itself.
 
 **"I bought it but premium didn't unlock"** with `in_app_purchase_key` false and the server on the developer's Mac.
-- Good: reads `in_app_purchase_key` early, says access then waits for Apple's notification, names the key as the fix for the first unlock and the tunnel as the need for renewals and refunds, and gives the dashboard path (Settings, Apple keys, then App settings, Apple keys, under In-App Purchase).
-- Bad: says only a tunnel will fix the first unlock when the key is set, or blames the purchase.
+- Good: reads `in_app_purchase_key` early, says access then waits for Apple's notification, names the key as the fix for the first unlock and the notification URL as the need for renewals and refunds, and gives the dashboard path (Settings, Apple keys, then App settings, Apple keys, under In-App Purchase).
+- Bad: says only the notification URL will fix the first unlock when the key is set, or blames the purchase.
 
 **"The paywall is empty on my phone."**
 - Good: checks `list_paywalls` and `get_paywall` for a live version and products.

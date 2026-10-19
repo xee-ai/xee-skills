@@ -92,7 +92,7 @@ skill does not, the page wins; say so.
 
 | Tool | Use it to |
 |---|---|
-| `list_apps`, `get_app` | The app's Xee ID and `sdk_key`, `bundle_id`, `apple_app_id`, `server_url`, and `in_app_purchase_key` (`true` or `false`: whether the key is set, never the key). |
+| `list_apps`, `get_app` | The app's Xee ID and `sdk_key`, `bundle_id`, `apple_app_id`, and `in_app_purchase_key` (`true` or `false`: whether the key is set, never the key). |
 | `list_products`, `get_product` | Which products Xee has, and one product's status against App Store Connect. |
 | `create_product`, `sync_products` | Add a product to Xee, or read the products from App Store Connect into Xee. Only after a confirm. Neither creates anything in App Store Connect. |
 | `list_paywalls`, `get_paywall` | Paywall IDs, whether each is live, version, variables and products. |
@@ -115,7 +115,7 @@ put the token in code, in a file in the project, or in a message.
 1. `list_apps`; match the app by `bundle_id` against the project's bundle identifier. Take its
    ID. No such app: the user creates it in the Xee dashboard with the exact bundle ID, then
    you list again. You cannot create it.
-2. From the same entry read `sdk_key`, `server_url` and `in_app_purchase_key`. A null
+2. From the same entry read `sdk_key` and `in_app_purchase_key`. A null
    `sdk_key` or `bundle_id` means the user sets it in App settings, iOS SDK.
 3. **`in_app_purchase_key` false is a blocker for a smooth migration, not for the plan.** Say
    what it means: Xee will record purchases but access waits for Apple's notification, so
@@ -365,7 +365,7 @@ keep the old account until the last old build is gone if they want its history.
   before trying again.
 - **Placement and paywall IDs.** An old placement the code still asks for must exist in Xee,
   live with a version, or the call throws.
-- **Release builds.** Lower verbose logging; no local server URL.
+- **Release builds.** Lower verbose logging.
 - **Test purchases are not proof of migration.** An Xcode StoreKit configuration file never
   reaches Apple, so Xee never sees it.
 

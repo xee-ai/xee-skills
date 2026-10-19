@@ -68,7 +68,7 @@ The Events page lists every notification Apple sent to Xee, and every purchase X
 - Check that the **Notification URL** from App settings, iOS SDK is pasted in App Store Connect for both Production and Sandbox, with **Version 2** chosen.
 - Check that the **Bundle ID** in App settings, iOS SDK matches the app. Notifications for another bundle are rejected.
 - If you set the **Apple app ID**, check it too. Xee rejects a production notification whose app ID does not match.
-- Your server must be reachable from the internet over HTTPS. Apple cannot reach `127.0.0.1` or a private network. A purchase can still unlock against a local server when the In-App Purchase key is set, but renewals, expiry and refunds only arrive through notifications.
+- Renewals, expiry and refunds reach Xee only through these notifications, so the Notification URL must be set for both Production and Sandbox, with Version 2.
 - Purchases made with a StoreKit configuration file in Xcode never reach Apple's servers, so no notification is sent. Use a sandbox account, as in [Test purchases in the sandbox](/docs/sandbox-testing).
 
 ### Purchase succeeded but premium is not active
@@ -77,7 +77,7 @@ Work through these in order:
 
 1. **The In-App Purchase key.** Without it, Xee asks Apple nothing when the SDK reports a purchase, and access waits for Apple's notification. Ask Claude to run `list_apps`: `in_app_purchase_key` must be `true`. Otherwise add the key as in [Check subscription status](/docs/subscription-status), then call `Xee.restorePurchases()` to bring in the purchase.
 2. **Events.** Find the purchase in Events. A `VERIFIED_WITH_APPLE` event means Xee checked it with Apple; a purchase notification such as `SUBSCRIBED` means Apple's own message arrived. If neither is there, the check did not run or did not pass.
-3. **The check itself.** A check that fails never fails the SDK call: the profile comes back as it stands, and your server's log says why, for example Apple refused the key, the answer was for another bundle ID, or its signature did not verify. Check that the key's Issuer ID and Key ID are right and that the **Bundle ID** matches your app.
+3. **The check itself.** A check that fails never fails the SDK call: the profile comes back as it stands, and Xee's log says why, for example Apple refused the key, the answer was for another bundle ID, or its signature did not verify. Check that the key's Issuer ID and Key ID are right and that the **Bundle ID** matches your app.
 4. **Notifications.** If the key is set but the check failed, access still arrives with Apple's notification. See the section above if it does not.
 5. **Sandbox or Xcode.** A purchase from a StoreKit configuration file in Xcode never unlocks, because Apple has no record of it. Use a sandbox account.
 6. **Timing.** Refresh the profile with `Xee.getProfile()` a few seconds after the purchase, or update your UI from `didLoadLatestProfile` on your `XeeDelegate`.
@@ -164,8 +164,8 @@ These pass on the code StoreKit gave. Read `originalError` for Apple's full erro
 | --- | --- | --- |
 | `notActivated` | 2002 | The SDK is not activated yet, or the server refused the SDK key (401 or 403). See above. |
 | `badRequest` | 2003 | The server answered with a 4xx, for example 404 when a paywall is not found or not live, or 409 when `identify` is refused. |
-| `serverError` | 2004 | The server answered with a 5xx or 429. Retry later, and check the server's logs. |
-| `networkFailed` | 2005 | The request did not get through: no connection, a timeout, or a wrong server URL. If you set `.with(serverUrl:)`, check that the device can reach that address: a server on your Mac is reachable from the Simulator only. |
+| `serverError` | 2004 | The server answered with a 5xx or 429. Retry later. |
+| `networkFailed` | 2005 | The request did not get through: no connection, or a timeout. Check the device's connection and try again. |
 | `decodingFailed` | 2006 | The SDK could not read a response or a stored file. |
 | `encodingFailed` | 2009 | The SDK could not build a request. |
 
@@ -186,4 +186,4 @@ These pass on the code StoreKit gave. Read `originalError` for Apple's full erro
 
 - Reproduce the problem with `.verbose` logs and keep the full console output.
 - Check the Events page and the user's profile to see what Xee received.
-- Check your Xee server's logs. It logs every notification it rejects, with the reason, such as a wrong bundle ID.
+- Check the Bundle ID and the Notification URL again: Xee rejects a notification with the wrong bundle ID or an unknown URL.

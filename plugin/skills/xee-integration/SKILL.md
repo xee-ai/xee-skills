@@ -1,6 +1,6 @@
 ---
 name: xee-integration
-description: Use when someone wants in-app purchases or subscriptions working in an iOS (Swift) app with Xee, from an empty project to a first sandbox purchase. Triggers on "add subscriptions to my app", "integrate Xee", "set up in-app purchases", "add a paywall", "add the Xee SDK", "install Xee", "make purchases work", "add a restore button", "unlock premium after purchase", "identify my users", "show a paywall from Xee". Adds the SDK with Swift Package Manager, activates it with the app's SDK key and server URL, identifies users, loads a paywall and its values, makes and restores purchases, reads subscription status, logs paywall views, and gets to a first sandbox purchase. It does not replace Adapty, RevenueCat or existing purchase code (use `xee-migration`), does not diagnose a purchase that already fails or a missing event (use `purchase-testing`), does not answer a pure "how does X work" docs question (use `xee-docs`), and does not build or run paywall tests (use `paywall-tests`). Xee is iOS-only for now.
+description: Use when someone wants in-app purchases or subscriptions working in an iOS (Swift) app with Xee, from an empty project to a first sandbox purchase. Triggers on "add subscriptions to my app", "integrate Xee", "set up in-app purchases", "add a paywall", "add the Xee SDK", "install Xee", "make purchases work", "add a restore button", "unlock premium after purchase", "identify my users", "show a paywall from Xee". Adds the SDK with Swift Package Manager, activates it with the app's SDK key, identifies users, loads a paywall and its values, makes and restores purchases, reads subscription status, logs paywall views, and gets to a first sandbox purchase. It does not replace Adapty, RevenueCat or existing purchase code (use `xee-migration`), does not diagnose a purchase that already fails or a missing event (use `purchase-testing`), does not answer a pure "how does X work" docs question (use `xee-docs`), and does not build or run paywall tests (use `paywall-tests`). Xee is iOS-only for now.
 ---
 
 # xee-integration
@@ -50,7 +50,7 @@ Every message, not only the fixed blocks:
 - **Access has two sources.** When the SDK reports a purchase or a restore, Xee also asks
   Apple for the subscription's status with the app's In-App Purchase key, checks Apple's
   signature and bundle ID, and records it for the profile that reported it, so `premium`
-  turns on right after the purchase, even with a local server Apple cannot reach. Apple's
+  turns on right after the purchase. Apple's
   signed App Store Server Notifications still carry everything after that (renewals,
   expiry, cancellation, grace period, refunds, refund saver) while the app is closed, so
   the notification URL must still be set. Without the In-App Purchase key Xee asks Apple
@@ -64,7 +64,7 @@ Every message, not only the fixed blocks:
 ## Read the docs first
 
 Use the Xee MCP tools `list_docs` (slugs, sections, titles) and `get_doc` (one page as
-Markdown, with the real method names and the server address filled in). Fetch the stage's
+Markdown, with the real method names). Fetch the stage's
 page **before writing that stage's code**, every time, even if you remember it. Do not
 assemble a slug from a topic; take it from `list_docs`.
 
@@ -88,7 +88,7 @@ The `xee` MCP server. Real tools only:
 
 | Tool | Use it to |
 |---|---|
-| `list_apps`, `get_app` | Find the app's Xee ID (all stages that need an `app`), and read its setup values: `sdk_key`, `bundle_id`, `apple_app_id`, `server_url`, and `in_app_purchase_key` (`true` or `false`: whether the key is set, never the key). |
+| `list_apps`, `get_app` | Find the app's Xee ID (all stages that need an `app`), and read its setup values: `sdk_key`, `bundle_id`, `apple_app_id`, and `in_app_purchase_key` (`true` or `false`: whether the key is set, never the key). |
 | `list_docs`, `get_doc` | Read the docs, as above. |
 | `list_products`, `get_product` | See which products Xee has, and one product's status. |
 | `create_product` | Add a product to **Xee** (USD price, period, access `premium`). It does **not** create it in App Store Connect. |
@@ -103,8 +103,7 @@ to product upkeep; do not use them here.
 **If there are no Xee tools** (no `list_apps`, no `get_doc`), the `xee` MCP server is not
 connected. Tell the user, in one short message, to connect it with the steps on the docs
 page `use-xee-in-claude` (dashboard path `/docs/use-xee-in-claude`: make a token under
-Settings, MCP, then add the server to Claude Code), and **stop**. Do not guess the API, the
-server URL or the SDK key. Never put the token in code, in a file in the project, or in
+Settings, MCP, then add the server to Claude Code), and **stop**. Do not guess the API or the SDK key. Never put the token in code, in a file in the project, or in
 a message.
 
 ## Stage 0: Look at the project (You)
@@ -137,14 +136,12 @@ Xee dashboard (the bundle ID must match the Xcode project exactly) and you call 
 You cannot create the app. If `bundle_id` is null, the app has no bundle ID yet: the user sets it in
 App settings, iOS SDK.
 
-**1b. The SDK key and server URL (You).** The same `list_apps` entry (or `get_app`) carries the
-app's `sdk_key` (starts with `xee_`) and `server_url`. Use them: write the real `sdk_key` into the
+**1b. The SDK key (You).** The same `list_apps` entry (or `get_app`) carries the
+app's `sdk_key` (starts with `xee_`). Use it: write the real `sdk_key` into the
 activation code, never the `xee_YOUR_SDK_KEY` placeholder from the docs. If `sdk_key` is null,
 say so and tell the user to open App settings, iOS SDK in the dashboard and paste it; do not leave a
-placeholder and say the work is done. Without `.with(serverUrl:)` the SDK talks to the hosted
-Xee server, `https://api.xee.ai`, so the key alone is enough. Add `.with(serverUrl:)` only when
-the developer runs a different server; one on their Mac works only in the Simulator, and a
-release build needs an HTTPS address.
+placeholder and say the work is done. The key is all the SDK needs:
+`Xee.activate(withAPIKey:)`. Never ask the user which server to use.
 
 The SDK key is **public**: it is made to ship inside the app. Say so when you put it in the
 code. If it ever leaks where it should not, it can be rotated on the same tab, and the new
@@ -281,11 +278,9 @@ and wait for a yes on each:
    MCP does not return it) and pastes it into
    App Store Connect (your app, App Information, App Store Server Notifications) for both
    Production and Sandbox, choose Version 2. The bundle ID in Xee must match the app.
-2. **Server reachable, for notifications.** Apple must reach the server over HTTPS to deliver
-   them. A server on the developer's Mac needs a tunnel for that, and the tunnel address
-   becomes the server URL in the app. With the In-App Purchase key set, the first unlock
-   does not need it: Xee asks Apple itself. A tunnel then matters for renewals, expiry and
-   refunds, not for the first purchase.
+2. **First unlock.** With the In-App Purchase key set, the first unlock does not need the
+   notification: Xee asks Apple itself. The notification then matters for renewals, expiry and
+   refunds.
 3. **Sandbox account.** App Store Connect, Users and Access, Sandbox, Test Accounts. Use a
    fresh one for a first purchase or trial.
 4. **A real device**, Developer Mode on, signed into the sandbox account under Settings,
@@ -310,7 +305,7 @@ sandbox account, tap restore.
 - Never hardcode a customer user ID. Never leave the `xee_YOUR_SDK_KEY` placeholder in the code
   and report the integration as done: fill in the app's real `sdk_key` from `list_apps`, or say
   plainly that it is missing.
-- Never commit server URLs, MCP tokens or Apple keys anywhere. The MCP token acts as the user;
+- Never commit MCP tokens or Apple keys anywhere. The MCP token acts as the user;
   keep it out of the project, out of chats, and out of logs.
 - Never assume anything about App Store Connect (that a product exists, that the URL is
   pasted, that an agreement is active). Ask, or have the user check.
@@ -325,7 +320,7 @@ sandbox account, tap restore.
 - Never run `create_paywall`, `push_paywall_version`, `create_product` or `sync_products`, or edit project
   files broadly, without the confirm described above.
 - Never start a test. Suggesting is `paywall-tests`; starting is the user's, in the dashboard.
-- Never leave verbose logging or a tunnel/local server URL in a release build.
+- Never leave verbose logging in a release build.
 
 ## Final checklist
 
@@ -333,7 +328,7 @@ Go through it and report each line as done, not done, or not checked (with how t
 
 - [ ] Project is iOS (Swift); no conflicting purchase SDK, or the user chose to hand over to `xee-migration`.
 - [ ] `Xee` package added to the app target; project builds.
-- [ ] Activated once at launch with the app's SDK key, and with `.with(serverUrl:)` set only for a different server, and to an HTTPS address in a release build.
+- [ ] Activated once at launch with the app's SDK key.
 - [ ] Users identified, or the user knows access will not follow them across devices.
 - [ ] `in_app_purchase_key` is `true`, or the user knows access then waits for notifications.
 - [ ] Products exist in App Store Connect and in Xee (`list_products`).
@@ -344,7 +339,7 @@ Go through it and report each line as done, not done, or not checked (with how t
 - [ ] Gating reads `premium` from the profile.
 - [ ] Notification URL set for Production and Sandbox, Version 2; bundle ID matches.
 - [ ] A sandbox purchase: `VERIFIED_WITH_APPLE` or `SUBSCRIBED` event in the dashboard, profile updated, `premium` active.
-- [ ] Before release: log level lowered, server URL is production HTTPS.
+- [ ] Before release: log level lowered.
 
 ## What to hand back
 

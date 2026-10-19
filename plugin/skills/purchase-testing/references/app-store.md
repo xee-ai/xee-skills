@@ -30,7 +30,7 @@ iterating; never accept it as verification.
 ## In-App Purchase key
 
 With this key Xee asks Apple for the subscription's status when the SDK reports a purchase
-or a restore, so `premium` turns on right away, even when Apple cannot reach the server.
+or a restore, so `premium` turns on right away.
 Without it, access waits for Apple's notification. `in_app_purchase_key` from `list_apps`
 says whether it is set. If not, the user generates one in App Store Connect (Users and
 Access, Integrations, In-App Purchase), adds it in the Xee dashboard under Settings, Apple
@@ -47,11 +47,6 @@ settings, iOS SDK. In App Store Connect, open the app, then App Information, App
 Server Notifications. Paste it into both the Production and the Sandbox Server URL and
 choose Version 2 for each. The Bundle ID in App settings, iOS SDK must match the app
 exactly: Xee rejects notifications for any other bundle.
-
-A local server needs an HTTPS tunnel for notifications. The tunnel's address is the server
-URL in the app and the base of the Notification URL; if the tunnel's address changes, both
-must change. With the In-App Purchase key set, the first unlock works without the tunnel; the
-tunnel matters for everything after it.
 
 ## Sandbox account
 

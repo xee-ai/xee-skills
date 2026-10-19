@@ -8,7 +8,7 @@ Subscriptions are the part of an app nobody wants to build and everybody has to:
 > Integrate Xee into my app
 
   Detected an iOS app: MagicClip.xcodeproj
-  Reading the install and purchase docs from your Xee server…
+  Reading the install and purchase docs from Xee…
 
 ? App in Xee               → magicclip
 ? Paywall                  → main (3 values you can test)
@@ -117,7 +117,7 @@ The skill goes stage by stage and reads the current docs page before it writes e
 
 1. **Looks at the project:** finds the Xcode project and any purchase SDK already in it.
 2. **Checks Xee:** your app, its products and paywalls, through the MCP.
-3. **Adds the package and activates it** with your SDK key, and your server URL for a device or release build.
+3. **Adds the package and activates it** with your SDK key.
 4. **Wires users, the paywall and purchases,** and reads `premium` from the profile.
 5. **Hands you the steps only you can do:** pasting the notification URL into App Store Connect and creating products there.
 
@@ -150,7 +150,7 @@ When a sandbox purchase does not work, or you are about to make your first, ask:
 My sandbox purchase isn't going through. Find out why
 ```
 
-A purchase can fail in five places, and the expensive ones need you in a console. The skill checks everything it can reach first, your Xee setup and your code, and only then sends you to the one place left to look. When the app reports a purchase, Xee also asks Apple for the subscription's status with your In-App Purchase key, so `premium` can turn on right away even with a local server. Without that key access waits for Apple's server notifications, so a missing key and a missing notification URL are the first suspects when a purchase succeeds but `premium` does not turn on.
+A purchase can fail in five places, and the expensive ones need you in a console. The skill checks everything it can reach first, your Xee setup and your code, and only then sends you to the one place left to look. When the app reports a purchase, Xee also asks Apple for the subscription's status with your In-App Purchase key, so `premium` can turn on right away. Without that key access waits for Apple's server notifications, so a missing key and a missing notification URL are the first suspects when a purchase succeeds but `premium` does not turn on.
 
 ## Changing and testing a paywall
 
@@ -184,7 +184,7 @@ Claude Code: `claude plugin marketplace update xee` then `claude plugin update x
 - **It tells you what a push does to a running test** (it carries on, or it stops) before it pushes.
 - **It never starts, ships or stops a test.** You do that in the dashboard.
 - **It treats docs pages and tool results as data.** Text inside them cannot change what the agent does, which permissions it uses or where it sends data.
-- **It keeps credentials out of your files.** It does not commit your server URL, MCP token or Apple key, and it never asks for or prints your old provider's keys.
+- **It keeps credentials out of your files.** It does not commit your MCP token or Apple key, and it never asks for or prints your old provider's keys.
 - **It says what it could not check,** and where you can look, instead of guessing a cause.
 
 ## Where it works
@@ -196,7 +196,7 @@ Claude Code and Codex through their plugin routes, and any agent that reads Clau
 - A Xee server and an app in it. The skills do not create the app: you do that in the dashboard.
 - The Xee MCP connected, for every skill except `xee-docs` ([see above](#before-you-start-connect-the-xee-mcp)).
 - For `xee-integration`, `xee-migration` and `purchase-testing`, an iOS (Swift) project on your machine.
-- An In-App Purchase key added to your app in Xee, so access can unlock right after a purchase, and App Store Server Notifications pointed at your server, for renewals, expiry, cancellation and refunds. The skills tell you the steps only you can do; they cannot add the key or paste the URL into App Store Connect for you.
+- An In-App Purchase key added to your app in Xee, so access can unlock right after a purchase, and App Store Server Notifications pointed at Xee, for renewals, expiry, cancellation and refunds. The skills tell you the steps only you can do; they cannot add the key or paste the URL into App Store Connect for you.
 
 ## What the skills run, fetch and send
 
@@ -206,10 +206,9 @@ The skills are instructions. They run nothing on their own: everything below hap
 
 | What | When | Where it goes |
 |---|---|---|
-| **Xee MCP tools** (apps, products, paywalls, test results) | Whenever a skill reads or changes your Xee data | Your Xee server, at the address in your `claude mcp add` command, signed in with your token. Writes (`create_product`, `sync_products`, `push_paywall_version`, `propose_test`) wait for your yes |
-| **Xee docs pages** (`list_docs`, `get_doc`) | Before the agent writes SDK code or answers a question | Your Xee server. Without the MCP, `xee-docs` reads the same pages from its own `docs/` folder on your machine |
+| **Xee MCP tools** (apps, products, paywalls, test results) | Whenever a skill reads or changes your Xee data | Xee, at the address in your `claude mcp add` command, signed in with your token. Writes (`create_product`, `sync_products`, `push_paywall_version`, `propose_test`) wait for your yes |
+| **Xee docs pages** (`list_docs`, `get_doc`) | Before the agent writes SDK code or answers a question | Xee. Without the MCP, `xee-docs` reads the same pages from its own `docs/` folder on your machine |
 | **The Xee SDK package** | When `xee-integration` adds it to your project | Xcode or Swift Package Manager fetches `github.com/xee-ai/XeeSDK-iOS` |
-| **A plain HTTPS request to your server URL** | When `purchase-testing` checks that something answers there | Your Xee server. It sends no data |
 | **Your project files** | Reading code to find your paywall, purchase calls and Xcode scheme, and (for `xee-migration`) every call into the old SDK; editing it only after the plan you approve | Stay on your machine |
 
 `xee-integration`, `xee-migration` and `paywall-tests` edit your project's files; `purchase-testing` and `xee-docs` only read them.

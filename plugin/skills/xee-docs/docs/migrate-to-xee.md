@@ -28,8 +28,8 @@ What differs:
 
 - Xee has one access level, `premium`. Every product in Xee unlocks it.
 - Your paywall stays your own view. Xee holds its values and products. See [Get a paywall and its values](/docs/get-paywall).
-- Access comes from Apple, checked by your server. Xee asks Apple about a purchase or a restore with your In-App Purchase key, and the rest arrives in Apple's notifications. See [Make purchases](/docs/make-purchases).
-- Adapty's SDK talks to Adapty's cloud; Xee's talks to the Xee server, `https://api.xee.ai`.
+- Access comes from Apple, checked by Xee. Xee asks Apple about a purchase or a restore with your In-App Purchase key, and the rest arrives in Apple's notifications. See [Make purchases](/docs/make-purchases).
+- Adapty's SDK talks to Adapty's cloud; Xee's talks to Xee.
 
 Here is the Adapty code the rest of this page replaces:
 
@@ -45,7 +45,7 @@ let restored = try await Adapty.restorePurchases()
 
 ## Before you start
 
-- **A public HTTPS server.** Your Xee server must be reachable by Apple, because Apple's notifications carry renewals, expiry, cancellations and refunds. You can try phases 1 to 4 against a local server, but real users and phase 5 need the public one. See [Install & configure](/docs/install).
+- **The notification URL.** Apple's notifications carry renewals, expiry, cancellations and refunds. Phase 5 moves the notification URL to Xee, and you set it in App Store Connect. See [Install & configure](/docs/install).
 - **The app in Xee,** with the same bundle ID as the app. Notifications and answers for another bundle are rejected.
 - **Your products in Xee.** Run Sync on the Products page, or ask Claude to run `sync_products`.
 - **The In-App Purchase key,** added in Settings, Apple keys and chosen for the app. Restoring existing subscribers depends on it. `list_apps` shows `in_app_purchase_key: true` when it is set.

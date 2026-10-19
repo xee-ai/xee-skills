@@ -4,18 +4,18 @@ To decide whether to show paid content or a paywall, check the user's access lev
 
 A profile learns about a subscription in two ways:
 
-- **From the SDK.** When the app reports a purchase or a restore, Xee asks Apple about it with your app's In-App Purchase key and records the answer, so `premium` is on right after the purchase. This needs the key and nothing else: it works with a local server too, because your server calls Apple and Apple never has to reach it.
-- **From Apple's notifications.** Apple sends signed App Store Server Notifications to your Xee server for everything that happens later while the app may be closed: renewals, expiry, cancellation, grace period and billing retry, and refunds. Without them, a renewal or a cancellation never reaches the profile.
+- **From the SDK.** When the app reports a purchase or a restore, Xee asks Apple about it with your app's In-App Purchase key and records the answer, so `premium` is on right after the purchase. This needs the key and nothing else.
+- **From Apple's notifications.** Apple sends signed App Store Server Notifications to Xee for everything that happens later while the app may be closed: renewals, expiry, cancellation, grace period and billing retry, and refunds. Without them, a renewal or a cancellation never reaches the profile.
 
 Set up both:
 
 1. **In-App Purchase key.** In App Store Connect, go to Users and Access, Integrations, In-App Purchase and generate a key. Add it in [Settings, Apple keys](/settings?tab=keys) with its Issuer ID, Key ID and `.p8` file, then choose it for the app in App settings, Apple keys, under **In-App Purchase**. With Claude connected, `list_apps` shows `in_app_purchase_key: true` once it is set.
-2. **Notification URL.** Open App settings, iOS SDK in the Xee dashboard and copy the **Notification URL**. In App Store Connect, open your app, **App Information**, **App Store Server Notifications**, paste the URL for both **Production** and **Sandbox**, and choose **Version 2**. Your Xee server must be reachable from the internet over HTTPS for Apple to deliver them.
+2. **Notification URL.** Open App settings, iOS SDK in the Xee dashboard and copy the **Notification URL**. In App Store Connect, open your app, **App Information**, **App Store Server Notifications**, paste the URL for both **Production** and **Sandbox**, and choose **Version 2**.
 
 The bundle ID in App settings, iOS SDK must match your app: Xee rejects notifications, and answers from Apple, for any other bundle.
 
 > [!IMPORTANT]
-> Without the In-App Purchase key, Xee asks Apple nothing and a profile changes only when Apple's notification reaches your server. That can come after the purchase call returns, and it does not come at all while Apple cannot reach your server, such as a local one. Add the key first. See [Make purchases](/docs/make-purchases) for how the check works and [Identify users](/docs/identify-users) for which profile gets the subscription.
+> Without the In-App Purchase key, Xee asks Apple nothing and a profile changes only when Apple's notification reaches Xee. That can come after the purchase call returns. Add the key first. See [Make purchases](/docs/make-purchases) for how the check works and [Identify users](/docs/identify-users) for which profile gets the subscription.
 
 ## Get the profile
 

@@ -1,4 +1,4 @@
-When a customer asks Apple for a refund, Apple asks your server how the purchase was used before it decides. Refund saver answers those requests for you, with your preferred outcome and what Xee knows about the customer, so a well-used subscription is less likely to be refunded by default.
+When a customer asks Apple for a refund, Apple asks Xee how the purchase was used before it decides. Refund saver answers those requests for you, with your preferred outcome and what Xee knows about the customer, so a well-used subscription is less likely to be refunded by default.
 
 Refund saver works with the App Store only.
 

@@ -95,7 +95,7 @@ Say the app and paywall by the IDs you see in the dashboard. A few to start with
 
 | Tool | What it does |
 | --- | --- |
-| `list_apps` | The apps you own in Xee, each with its public SDK key, bundle ID, Apple app ID, server address and `in_app_purchase_key`: `true` when the In-App Purchase key is set, which is what lets the server check purchases with Apple. |
+| `list_apps` | The apps you own in Xee, each with its public SDK key, bundle ID, Apple app ID and `in_app_purchase_key`: `true` when the In-App Purchase key is set, which is what lets the server check purchases with Apple. |
 | `get_app` | One app's setup values: the same as its entry in `list_apps`, `in_app_purchase_key` included. |
 | `list_paywalls` | An app's paywalls, with whether each is live and its latest version. |
 | `get_paywall` | The latest version of a paywall: its variables with their current values, its products, and the test running on it. |
@@ -124,7 +124,7 @@ Xee reads and edits your products through an App Store Connect API key. Reading 
 ## If it does not work
 
 - **xee is not connected, or Claude says unauthorized.** The token was typed wrong or has been revoked. Check [Settings, MCP](/settings?tab=mcp), make a new token, then run `claude mcp remove xee` and add it again.
-- **Cannot reach the server.** The address in the command must be the Xee server, `{{server}}`, not the dashboard. When running locally, start the server first.
+- **Cannot connect.** The address in the command must be `{{server}}/mcp`, not the dashboard's address.
 - **"The key is not allowed to do this (403)" when editing a product.** The App Store Connect key has the wrong role. Make a new key with App Manager or Admin access, as above.
 - **Claude cannot see the app.** A token reaches only the apps of the account that made it.
 - **A push is refused as out of date.** Someone pushed a newer version. Ask Claude to read the paywall again and redo the change on top of it.
