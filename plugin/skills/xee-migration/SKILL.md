@@ -125,7 +125,9 @@ put the token in code, in a file in the project, or in a message.
    file.
 4. `list_products` and `list_paywalls`. Compare with what the old SDK sells (inventory). Note
    products the old SDK sells that Xee lacks, and old placements with no paywall in Xee. You
-   create those paywalls in phase 1; put them in the plan.
+   create those paywalls in phase 1; put them in the plan with the ID you will use and where
+   it came from (old placement ID, view name, or your suggestion), and the products with their
+   source (code, or the user reading them from the old SDK's dashboard).
 
 ## Phase 0: Inventory and plan (You, read-only)
 
@@ -197,8 +199,29 @@ Goal: Xee can serve the app, with the old SDK still in charge. Nothing in the ap
    exist there.
 3. **You, after a confirm:** every paywall the code asks for exists in Xee. For an old placement
    with no Xee paywall, create it by pushing a first version with `push_paywall_version`,
-   `base_version` 0, under the paywall ID from the plan:
-   - `products`: the product IDs that placement offers today (in Xee since step 2).
+   `base_version` 0. There is no separate create tool: this first push creates the paywall,
+   and it then appears under Paywalls in the dashboard.
+   - **ID**, in this order:
+     1. The old SDK's own ID for that screen: Adapty's placement ID (the string passed to
+        `Adapty.getPaywall(placementId:)`), RevenueCat's offering identifier, or the like.
+     2. No such ID (plain StoreKit): the paywall view's type name, such as `PaywallView`
+        becoming `paywall`, or `OnboardingPaywallViewController` becoming `onboarding`.
+     3. Neither fits: suggest one from what the screen is for (`onboarding`, `settings-upgrade`).
+
+     Xee IDs are 1 to 40 lowercase letters, digits, `-` or `_`. Lower-case the old ID and turn
+     anything else into `-` (`Main Paywall` becomes `main-paywall`), and say when it changed:
+     the new code must ask for the Xee ID.
+   - **Products**, the ones that screen offers today, in this order:
+     1. Product IDs in the project: constants, a `.storekit` configuration file, a list passed
+        to `Product.products(for:)` or `SKProductsRequest`, or a fallback paywall file.
+     2. Adapty and RevenueCat keep a paywall's products in their own dashboards, not in code.
+        Ask the user to read them there (Adapty: Placements, the placement, its paywall,
+        Products; RevenueCat: Offerings, the offering, Packages) and paste the product IDs.
+        Never ask for the old SDK's secret keys.
+     3. Match against Xee's catalogue (`list_products`, after step 2). A product the screen
+        offers that Xee lacks goes back to step 2 first: a paywall's products must be in Xee.
+
+     Never guess a product ID. Show the list and its source before the push.
    - `variables`: the values the screen reads (Adapty's remote config keys, RevenueCat's
      offering metadata, or the strings hard-coded in the view), each with today's value as its
      default. Copy them as they are; do not rewrite copy during a migration.
