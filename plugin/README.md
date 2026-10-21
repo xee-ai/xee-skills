@@ -28,6 +28,7 @@ Install the plugin once and you have every skill below.
 | [`xee-migration`](#migrating-from-adapty-or-another-sdk) | Moves a live app off Adapty, RevenueCat or hand-written StoreKit code onto Xee in phases, each with a way back. Plans the replacement call by call first, and removes nothing without your yes | Xee MCP |
 | [`purchase-testing`](#testing-a-purchase) | Gets your first sandbox purchase through. When one fails, it checks Xee and your code before sending you to a console, then names where it broke | Xee MCP |
 | [`paywall-tests`](#changing-and-testing-a-paywall) | Moves a paywall's copy and values into Xee, pushes new versions safely, suggests tests worth running, and reads the results | Xee MCP |
+| [`paywall-sync`](#after-you-change-the-paywall-code) | After you or your agent change the paywall's Swift code, compares it with Xee, rebuilds the dashboard preview and variables from the code, and pushes a new version | Xee MCP |
 | [`xee-docs`](#asking-the-docs) | Answers a question about Xee (an SDK method, a dashboard setting, an error code, what the MCP can do) from the right docs page | nothing |
 
 ## What you can ask
@@ -38,6 +39,7 @@ Say what you want the way you would brief a colleague. You do not need to name a
 - "Migrate my app from Adapty to Xee. Plan it first."
 - "My sandbox purchase went through but premium did not unlock. Why?"
 - "Make the headline on my paywall testable and push it to Xee."
+- "I changed the paywall code. Update it in Xee."
 - "What should I test on my paywall to convert better?"
 - "How is the test on the main paywall doing? Which arm is ahead?"
 - "What does error 2003 mean?"
@@ -164,6 +166,16 @@ The skill moves hard-coded values into variables, keeps the defaults in your cod
 
 **It never starts a test.** You start, stop and ship tests in the dashboard.
 
+## After you change the paywall code
+
+When the paywall's Swift code changed first, by you or by your agent, Xee's preview and variables fall behind.
+
+```
+I changed the paywall code. Update it in Xee.
+```
+
+The skill reads the view and the struct that decodes its values, compares them with the latest version in Xee, and shows what differs: added, removed, renamed or changed variables, and what changed in the design. It says what the push does to a running test and to apps already installed, rebuilds the preview from the code, and pushes after your yes. If nothing differs, it pushes nothing.
+
 ## Asking the docs
 
 ```
@@ -211,7 +223,7 @@ The skills are instructions. They run nothing on their own: everything below hap
 | **The Xee SDK package** | When `xee-integration` adds it to your project | Xcode or Swift Package Manager fetches `github.com/xee-ai/XeeSDK-iOS` |
 | **Your project files** | Reading code to find your paywall, purchase calls and Xcode scheme, and (for `xee-migration`) every call into the old SDK; editing it only after the plan you approve | Stay on your machine |
 
-`xee-integration`, `xee-migration` and `paywall-tests` edit your project's files; `purchase-testing` and `xee-docs` only read them.
+`xee-integration`, `xee-migration` and `paywall-tests` edit your project's files; `paywall-sync` reads them and edits one only after you agree; `purchase-testing` and `xee-docs` only read them.
 
 ## Privacy, license and support
 

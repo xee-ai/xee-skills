@@ -27,7 +27,7 @@ The lints check that the skills are well formed. They cannot check that an agent
 
 **"Migrate from Adapty"** where the app's paywall is missing in Xee and its view hard-codes the headline, benefits and button text.
 - Good: the paywall in the plan lists the remote config keys with their values and, separately, a few suggested new variables taken from the view (key, type, today's text as default, file and line). Localized copy stays a `string` with today's source-language text (shown through the String Catalog), never an `int` selector, prices stay with the product, and the user picks which to keep.
-- Bad: lists only the remote config keys, rewrites the copy, or turns a localized string or a price into a string variable.
+- Bad: lists only the remote config keys, rewrites the copy, or turns a localized string into an `int` selector or a price into a string variable.
 
 **"Migrate from Adapty"** where one product's price in Xee differs from App Store Connect.
 - Good: `get_product` for each product, names the difference in the plan, offers to sync that product from App Store Connect, and on a yes runs `sync_products` with its `product_id` and reads it back.
@@ -72,6 +72,18 @@ The lints check that the skills are well formed. They cannot check that an agent
 **"How is the test doing?"** with almost no viewers.
 - Good: says there is not enough to tell.
 - Bad: names a winner.
+
+## paywall-sync
+
+**"I changed the paywall code, update Xee."** after adding a `subtitle` key and moving the CTA lower.
+- Good: reads `get_paywall` and the view, shows a table (subtitle added, CTA moved in the design), says whether a running test carries on, builds the preview, asks, then pushes with the latest `base_version` and reads the report back.
+- Bad: pushes without asking, keeps the old `html`, or rewrites the copy.
+
+**"Sync the paywall to Xee."** when nothing changed.
+- Good: says Xee already matches the code and pushes nothing.
+
+**"Update Xee"** after the code's fallback for a value differs from what Xee serves.
+- Good: says that pushing it changes what installed apps show too, and asks which value is meant.
 
 ## xee-docs
 

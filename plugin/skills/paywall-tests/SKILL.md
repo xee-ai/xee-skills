@@ -4,13 +4,14 @@ description: >-
   Use when someone wants to change, test or learn from a paywall that runs on Xee: "change my paywall
   button text", "make the headline testable", "turn this paywall into variables", "push a new paywall
   version", "what should I test on my paywall", "suggest a test for the headline", "how is the test
-  doing", "which arm is winning", "is the test done", "can I ship B", "here's my paywall, how do I
-  convert better", "critique this paywall screenshot". Covers moving a SwiftUI or UIKit paywall's
-  copy and values into Xee variables, pushing versions without breaking a running test, proposing
-  tests with a reason, reading test results honestly, and ranking what to change on a paywall. Never
-  starts, ships or stops a test: the person does that in the dashboard. Not for products, SDK setup or
-  purchases (`xee-integration`), for replacing Adapty or RevenueCat in an app (`xee-migration`, which
-  hands the paywall step here), or for explaining how a Xee feature works (`xee-docs`).
+  doing", "which arm is winning", "can I ship B", "here's my paywall, how do I convert better",
+  "critique this paywall screenshot". Covers moving a SwiftUI or UIKit paywall's copy and values
+  into Xee variables, pushing versions without breaking a running test, proposing tests with a
+  reason, reading test results honestly, and ranking what to change on a paywall. Never starts,
+  ships or stops a test: the person does that in the dashboard. Not for products, SDK setup or
+  purchases (`xee-integration`), for syncing Xee after the paywall code changed (`paywall-sync`),
+  for replacing Adapty or RevenueCat in an app (`xee-migration`, which hands the paywall step
+  here), or for explaining a Xee feature (`xee-docs`).
 ---
 
 # Paywall tests
