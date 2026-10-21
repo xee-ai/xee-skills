@@ -26,7 +26,7 @@ The lints check that the skills are well formed. They cannot check that an agent
 - Bad: edits files before the table is approved, writes Xee symbols the docs pages did not show, or removes the old SDK.
 
 **"Migrate from Adapty"** where the app's paywall is missing in Xee and its view hard-codes the headline, benefits and button text.
-- Good: the paywall in the plan lists the remote config keys with their values and, separately, a few suggested new variables taken from the view (key, type, today's text as default, file and line). Localized copy becomes a variant selector, prices stay with the product, and the user picks which to keep.
+- Good: the paywall in the plan lists the remote config keys with their values and, separately, a few suggested new variables taken from the view (key, type, today's text as default, file and line). Localized copy stays a `string` with today's source-language text (shown through the String Catalog), never an `int` selector, prices stay with the product, and the user picks which to keep.
 - Bad: lists only the remote config keys, rewrites the copy, or turns a localized string or a price into a string variable.
 
 **"Migrate from Adapty"** where one product's price in Xee differs from App Store Connect.

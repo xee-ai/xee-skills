@@ -243,8 +243,9 @@ Goal: Xee can serve the app, with the old SDK still in charge. Nothing in the ap
         exclusions: no price, period or trial length (those come from the product), no legal
         text or restore button, no layout. **A string the app localizes** (`String(localized:)`,
         a `Text` literal in an app with a String Catalog or `.lproj` in more than one language)
-        becomes a selector between localized variants (`bool` or small `int`, today's text is
-        `0` or `false`), not the text, and say why. Suggest the few worth testing, about three to
+        stays a `string` holding today's source-language text, shown through the catalog as
+        `paywall-tests` A2 says, never an `int` selector (the dashboard would show `0`, not
+        the words). Suggest the few worth testing, about three to
         eight, each with key, type, default, the `<file>:<line>` it comes from, and one line on
         what a test on it could learn.
      Every default is what the screen shows today, so the first push changes nothing users

@@ -19,7 +19,7 @@ For a paywall's first version, Claude reads the view and lists every value that 
 - **The default is what the screen shows today.** Claude picks which values become variables; it does not rewrite them. New wording is a test for later.
 - **Prices, periods, trial lengths and intro offers stay with the product** (`localizedPrice`, `subscriptionPeriod`, `subscriptionOffer`). A price typed into a variable goes stale and is wrong in other storefronts.
 - **Legal text, terms and privacy links, the restore button, and layout stay in code.**
-- **Text your app translates stays in your app.** Xee holds one set of values, so a text variable would show the same text in every language. Claude makes the variable choose between translated versions instead (`headline_variant`, an `int` where `0` is today's text). Numbers that read the same in every language, such as `"50K+"`, can be a `string`.
+- **Text your app translates is still text.** Xee holds one set of values, so the variable holds the text in your source language, and the app shows it through its String Catalog: a text with a translation shows translated, one without shows as written. The dashboard shows the words, not a number. New wording reaches other languages once its translations are in the catalog in a build; until then those users see the source text.
 
 Each new key needs code that reads it, with today's value as its fallback, so it only takes effect in a build with that code.
 

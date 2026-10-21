@@ -136,9 +136,15 @@ expresses it. Leave it in code when:
   price typed into a string variable goes stale and is wrong in other storefronts. Variable
   copy may be a template whose numbers the code fills in from the product, never the number itself.
 - **Legal and billing disclosures**, terms and privacy links, restore button, required text.
-- **Strings the app localizes.** Xee holds one set of values, so a variable would replace every
-  language with one. Keep localized strings in the app and, if the point is a test, make the
-  variable choose between localized variants (a `bool` or a small `int`), not hold the text.
+- **Strings the app localizes stay text.** Make them a `string` whose default is today's text in
+  the source language, and have the code show it through the app's catalog:
+  `Bundle.main.localizedString(forKey: value, value: value, table: nil)`. A text the catalog has
+  shows translated; one it lacks shows as written. Never a numbered selector (`headline_variant`,
+  `0` = today's text): the dashboard then shows `0` instead of the words, and nobody can read a
+  test. If the catalog's keys are identifiers (`paywall.title`), not the source text, add the
+  source text as a key for each such string, and say so in the plan. At the confirm point, say
+  that new wording reaches other languages only once its translations are in the catalog in a
+  build; until then those users see the source text.
 - **Layout the code owns** (spacing, fonts). A variable controls what a value says or whether a
   block shows, not a pixel.
 
@@ -232,8 +238,7 @@ classes), take the ones that phone gets.
 - Leave the iPhone's safe areas: 59 px at the top for the status bar and 34 px at the bottom for
   the home indicator, unless the view's content ignores the safe area (a background that does is
   not enough).
-- One state: what most users see today, each variable at its default. A variant selector marks
-  the element that shows variant `0`; do not stack the variants. Two variables the app picks
+- One state: what most users see today, each variable at its default. Two variables the app picks
   between by state (`headline` and `headline_trial`): draw and mark the one shown at default; the
   other has its number in the dashboard's list only. A block that shows only in one state (trial
   on or off) is shown as it is at its default. Something that appears after a delay (a skip
