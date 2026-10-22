@@ -22,7 +22,7 @@ The calls map almost one to one. The access level `premium`, the profile and the
 | `Adapty.logShowPaywall` | `Xee.logShowPaywallVariant(_:)`. |
 | `Adapty.makePurchase(product:)` | `Xee.makePurchase(product:)`, which returns an `XeePurchaseResult`: `.userCancelled`, `.pending` or `.success(profile:transaction:)`. |
 | `Adapty.restorePurchases()` | `Xee.restorePurchases()`, which returns the `XeeProfile`. |
-| Product price, period, locale, intro offer | `localizedPrice` and `price`, `subscriptionPeriod.unit` and `.numberOfUnits`, `priceLocale`, `sk1Product` and `sk2Product`, `subscriptionOffer`. |
+| Product price, period, locale, intro offer | `localizedPrice` and `price`, `subscriptionPeriod.unit` and `.numberOfUnits`, `priceLocale`, `sk2Product`, `subscriptionOffer`. |
 
 What differs:
 
@@ -50,7 +50,7 @@ let restored = try await Adapty.restorePurchases()
 - **Your products in Xee.** Run Sync on the Products page, or ask Claude to run `sync_products`. Claude also compares each product in Xee with App Store Connect (`get_product`). If a price, period, name or status differs, the plan says which, and on your yes Claude syncs that one product from App Store Connect. That changes Xee only, nothing at Apple. Claude never changes Xee's price with `edit_product` to make it match, because with Sync with App Store Connect on that would change the price at Apple.
 - **The In-App Purchase key,** added in Settings, Apple keys and chosen for the app. Restoring existing subscribers depends on it. `list_apps` shows `in_app_purchase_key: true` when it is set.
 - **The SDK key** from App settings, iOS SDK.
-- **iOS 15 or later for restore.** The package builds for iOS 13, but on iOS 13 and 14 the SDK restores through the app's receipt, and the Xee server has no route for it. Users on those versions cannot be brought in by restore.
+- **iOS 15 or later.** The SDK needs iOS 15. Raise the app's deployment target first if it is lower.
 - **A plan for the notification URL.** App Store Connect takes one URL per environment: one for Production and one for Sandbox. Adapty's setup asks for a URL in the same place, so today yours is probably Adapty's. Decide before each phase which service owns it, and check Adapty's own documentation and settings for whether it can forward notifications to another URL. Until Xee owns the URL, Xee gets no renewals or cancellations.
 
 ## The plan
@@ -118,8 +118,7 @@ let amount = product.price                        // Decimal, for your own forma
 let unit = product.subscriptionPeriod?.unit       // .day, .week, .month or .year
 let count = product.subscriptionPeriod?.numberOfUnits
 let locale = product.priceLocale                  // the storefront's locale
-let storeKit2 = product.sk2Product                // StoreKit 2 Product, iOS 15 and later
-let storeKit1 = product.sk1Product                // StoreKit 1 SKProduct, iOS 14 and earlier
+let storeKit2 = product.sk2Product                // the StoreKit 2 Product
 
 // The intro offer, set only when this user is eligible for it.
 if let offer = product.subscriptionOffer,
@@ -227,7 +226,6 @@ Remove the Adapty SDK, and the fallback in `isPro`, only when your own numbers s
 A subscriber gets into Xee when their device restores, as in phase 3, and Apple still reports the subscription. The limits:
 
 - **Only users who open the new build.** Those who never do reach Xee only through Apple's notifications for them, and a notification is matched to a profile by its app account token. A subscription bought through Adapty may carry no token that a Xee profile has, so those notifications may match nobody. That is why phase 3 keeps Adapty as a fallback.
-- **iOS 13 and 14** cannot restore into Xee, as above.
 - **The newest transaction is the one sent.** If your app also sells consumables or one-time purchases, the newest may not be the subscription, and Apple may report nothing for it.
 - **Revenue starts when Xee receives the notifications.** Verified checks count no revenue, and Xee has none of your earlier history.
 

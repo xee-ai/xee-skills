@@ -98,7 +98,7 @@ The call returns an `XeePurchaseResult`:
 | `.pending` | The purchase needs approval outside the app (for example Ask to Buy). Nothing is charged until it is approved. |
 | `.success(profile:transaction:)` | StoreKit completed the purchase. `profile` is the user's `XeeProfile` after Xee checked the purchase with Apple. If the app has no In-App Purchase key, or the check failed, it may not include the new purchase yet. |
 
-The result also has shortcuts: `isPurchaseSuccess`, `isPurchaseCancelled`, `isPurchasePending`, and `profile`, which is set only on success. For the StoreKit transaction itself, read `sk2Transaction` (iOS 15 and later) or `sk1Transaction`.
+The result also has shortcuts: `isPurchaseSuccess`, `isPurchaseCancelled`, `isPurchasePending`, and `profile`, which is set only on success. For the StoreKit transaction itself, read `sk2Transaction`.
 
 > [!NOTE]
 > Every product in Xee unlocks the `premium` access level. Check `profile.accessLevels["premium"]?.isActive` to decide whether the user has paid. See [Check subscription status](/docs/subscription-status) for reading it anywhere else in the app.
@@ -111,7 +111,7 @@ Do not hardcode the product list either. Which products a paywall offers is set 
 
 ### Offers
 
-If the user is eligible for an introductory offer, a promotional offer or a win-back offer on a product, it is on `product.subscriptionOffer`, and `makePurchase` applies it. Use it to show the trial or the discounted price before the user taps:
+If the user is eligible for an introductory offer or a win-back offer on a product, it is on `product.subscriptionOffer`, and `makePurchase` applies it. Use it to show the trial or the discounted price before the user taps:
 
 ```swift snippet="purchase-offers"
 if let offer = product.subscriptionOffer, offer.offerType == .introductory {
@@ -127,10 +127,7 @@ Show the offer only when `subscriptionOffer` is set. Advertising a trial the use
 
 Give the user a way to get back what they already bought, for example after reinstalling the app or on a new device. App Review expects a restore button on any screen that sells subscriptions. Call `Xee.restorePurchases()`; it reports the user's latest App Store transaction to Xee and returns their profile.
 
-What restore does depends on the iOS version:
-
-- **iOS 15 and later.** The SDK looks up the device's StoreKit history and sends the most recent transaction's ID to Xee. Xee asks Apple about it and records every subscription Apple reports for that customer on this profile. A subscription bought before Xee, with no app account token, comes onto the profile that restores it.
-- **iOS 13 and 14.** The SDK sends the app's receipt instead, and the Xee server has no route for it, so restore does not unlock access there. The profile shows `premium` only if Apple's notifications already put it there.
+The SDK looks up the device's StoreKit history and sends the most recent transaction's ID to Xee. Xee asks Apple about it and records every subscription Apple reports for that customer on this profile. A subscription bought before Xee, with no app account token, comes onto the profile that restores it.
 
 Restoring needs the In-App Purchase key like a purchase does. Without it, the profile shows `premium` only when Xee already holds a subscription for it, from Apple's notifications; identify the user with the same customer user ID they bought with before you restore on a new device.
 
@@ -164,37 +161,7 @@ Restoring never charges the user. If the restored subscription has expired, the 
 
 ## Purchases started in the App Store
 
-A user can start buying one of your in-app purchases from the App Store page itself (a promoted purchase). When that purchase reaches the app, the SDK asks your `XeeDelegate` through `shouldAddStorePayment(for:)`:
-
-- Return `true` (the default when you do not implement it) to show the payment sheet right away.
-- Return `false` to hold it, keep the `XeeDeferredProduct`, and finish it later with `Xee.makePurchase(product:)`, for example after onboarding.
-
-```swift title="Delegate" snippet="promoted-purchase-delegate"
-import Xee
-
-final class PurchaseDelegate: XeeDelegate {
-    func didLoadLatestProfile(_ profile: XeeProfile) {}
-
-    func shouldAddStorePayment(for product: XeeDeferredProduct) -> Bool {
-        // Keep `product` somewhere, then return false to wait.
-        false
-    }
-}
-
-// Later, when the app is ready:
-func resume(_ product: XeeDeferredProduct) async {
-    do {
-        _ = try await Xee.makePurchase(product: product)
-    } catch {
-        // Show the error.
-    }
-}
-```
-
-Set the delegate with `Xee.delegate = PurchaseDelegate()` early in launch, before you activate the SDK.
-
-> [!WARNING]
-> Either way, the payment comes from the App Store without an app account token and without a paywall `variationId`. With the In-App Purchase key set, Xee gives the subscription to the profile that reported it, but the sale is not attributed to a paywall. Without the key, Xee cannot match it to a user and access does not turn on. Prefer not to promote in-app purchases on your App Store page.
+The SDK does not handle purchases started from the App Store page itself (promoted purchases). Do not promote in-app purchases on your App Store page: such a payment carries no app account token and no paywall `variationId`, so Xee cannot attribute it to a paywall, and without the In-App Purchase key it cannot match it to a user.
 
 ## Next
 

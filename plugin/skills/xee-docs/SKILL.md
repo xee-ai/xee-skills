@@ -42,7 +42,7 @@ in it) or a 404. Use a slug from the table or from `list_docs`. If `list_docs` s
 | The question is about | Slug | What the page answers |
 | :--- | :--- | :--- |
 | Installing the SDK, SDK key, `activate`, logging and data options | `install` | Requirements, Swift package install, where the `xee_` key is (App settings, iOS SDK), activation, optional setup |
-| Buying, restore, offers, purchases started in the App Store | `make-purchases` | `makePurchase`, `restorePurchases`, when access turns on after a purchase, promoted purchases |
+| Buying, restore, offers, purchases started in the App Store | `make-purchases` | `makePurchase`, `restorePurchases`, when access turns on after a purchase, why promoted purchases are not supported |
 | Is the user premium, access levels, profile updates | `subscription-status` | `getProfile`, the `premium` access level, `XeeDelegate` updates, the cached profile, notification URL setup |
 | Customer user ID, login, logout, several devices | `identify-users` | `identify(_:withAppAccountToken:)`, anonymous vs identified profiles, `logout` |
 | Fetching a paywall, its values and products | `get-paywall` | `getPaywallVariant`, `remoteConfig`, fetch policies, `getPaywallVariantProducts` |

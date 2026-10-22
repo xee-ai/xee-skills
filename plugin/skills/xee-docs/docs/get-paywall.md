@@ -145,7 +145,7 @@ Each item is an `XeePaywallVariantProduct`. The properties you will use most:
 | `price`, `currencyCode`, `currencySymbol` | The price as a `Decimal` and its currency, for your own formatting. |
 | `localizedSubscriptionPeriod` | The period as text, for example `1 week`. |
 | `subscriptionPeriod` | The period as `unit` (`.day`, `.week`, `.month`, `.year`) and `numberOfUnits`. A quarterly plan is `.month` and `3`. |
-| `subscriptionOffer` | The intro, promotional or win-back offer this user can get, or `nil`. It has `offerType`, `price`, `localizedPrice`, `localizedNumberOfPeriods` and `localizedSubscriptionPeriod`. |
+| `subscriptionOffer` | The intro or win-back offer this user can get, or `nil`. It has `offerType`, `price`, `localizedPrice`, `localizedNumberOfPeriods` and `localizedSubscriptionPeriod`. |
 
 > [!IMPORTANT]
 > Do not hardcode product IDs or how many there are. Products are chosen per paywall version, so a new version can offer three products where the last one had two. Show every product you get back.

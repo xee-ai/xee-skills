@@ -17,7 +17,7 @@ change. This skill holds the order, the warnings and who does what; it never hol
 snippets. Before writing the code for any stage, fetch that stage's docs page (see
 "Read the docs first").
 
-**Platform.** Xee supports iOS only for now (Swift, Swift Package Manager, iOS 13+, Xcode 16+).
+**Platform.** Xee supports iOS only for now (Swift, Swift Package Manager, iOS 15+, Xcode 16+).
 If the project is Android, Flutter, React Native, web or anything else, say so in the first
 reply, plainly, and stop. Do not improvise a port.
 
@@ -113,7 +113,7 @@ Read-only. Do this before saying what you will change.
 1. Find the project: `*.xcodeproj`, `*.xcworkspace`, `Package.swift`. Several? Ask which
    target is the app. None? It is not an iOS project: say so and stop.
 2. Find the UI framework (SwiftUI `@main App` or UIKit `AppDelegate`/`SceneDelegate`), the
-   app's bundle ID, and the deployment target (Xee needs iOS 13 or later).
+   app's bundle ID, and the deployment target (Xee needs iOS 15 or later).
 3. Find any existing purchase code: `import StoreKit`, `import RevenueCat` / `Purchases`,
    `import Adapty`, `SKPaymentQueue`, `Product.purchase`, `Transaction.updates`.
 4. Find whether the project already has an account system (a user ID you can pass to Xee)
@@ -260,9 +260,9 @@ Fetch `make-purchases`. Wire:
 - A "Restore purchases" button on every screen that sells a subscription (App Review
   checks). On a new device, identify the user with the same customer user ID first, so the
   restored subscription lands on their profile.
-- Do not promote in-app purchases on the App Store page unless `make-purchases` says how the
-  current SDK handles it: that purchase carries no app account token and no paywall variation,
-  so it cannot be attributed to a paywall.
+- Do not promote in-app purchases on the App Store page: the SDK does not handle them, and such
+  a purchase carries no app account token and no paywall variation, so it cannot be attributed
+  to a paywall.
 
 ## Stage 5: Subscription status (You)
 

@@ -2,7 +2,7 @@ Add the Xee SDK to your iOS app with Swift Package Manager, then activate it onc
 
 ## Requirements
 
-- iOS 13 or later (macOS 11 and visionOS 1 are also supported).
+- iOS 15 or later (macOS 12 and visionOS 1 are also supported).
 - An Xcode version that supports Swift tools 6.0 (Xcode 16 or later).
 - Swift Package Manager. The SDK is not published to CocoaPods.
 - An app in Xee with its bundle ID set in App settings, iOS SDK.

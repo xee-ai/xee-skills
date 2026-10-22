@@ -19,7 +19,7 @@ call mapping**, and they change. This skill holds the order, the warnings and wh
 what; it never holds Xee SDK snippets. Before each phase and before writing any code, fetch
 the pages named under "Read the docs first".
 
-**Platform.** Xee is iOS only for now (Swift, Swift Package Manager, iOS 13+). A project in
+**Platform.** Xee is iOS only for now (Swift, Swift Package Manager, iOS 15+). A project in
 Android, Flutter, React Native or anything else: say so in the first reply and stop.
 
 ## How you sound
@@ -189,7 +189,7 @@ Ask these together with the plan, once, and record the answers in your reply:
    old provider stops receiving events. Which phase moves it, and Sandbox first or both at
    once?
 2. **How long to run both.** Time, or until a share of active users is on the new build.
-3. **Minimum iOS.** Xee needs iOS 13 or later; check the project's target against the
+3. **Minimum iOS.** Xee needs iOS 15 or later; check the project's target against the
    `install` page and say if it conflicts.
 4. **Existing subscribers.** Restore them into Xee on launch (once, in the new build), or
    wait until they next buy or tap restore? Read `make-purchases` for what restore does and

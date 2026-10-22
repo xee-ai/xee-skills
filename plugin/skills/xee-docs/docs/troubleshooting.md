@@ -57,7 +57,7 @@ do {
 `XeeError` is also an `NSError` in the `XeeErrorDomain` domain, and its `errorCode` is the number in the tables below.
 
 > [!NOTE]
-> On iOS 15 and later, a user who closes the payment sheet is not an error: `makePurchase(product:)` returns `.userCancelled`. You see `paymentCancelled` (2) mainly on iOS 13 and 14, where the SDK uses the older StoreKit API.
+> A user who closes the payment sheet is not an error: `makePurchase(product:)` returns `.userCancelled`.
 
 ## Common problems
 
@@ -140,8 +140,8 @@ These pass on the code StoreKit gave. Read `originalError` for Apple's full erro
 | `privacyAcknowledgementRequired` | 9 | The user has not yet accepted Apple's privacy policy. |
 | `unauthorizedRequestData` | 10 | The app used a StoreKit property it lacks the entitlement for. |
 | `invalidOfferIdentifier` | 11 | The offer ID does not exist in App Store Connect, or the offer was revoked. |
-| `invalidSignature` | 12 | The signature on a promotional offer is not valid. |
-| `missingOfferParams` | 13 | A promotional offer is missing parameters. |
+| `invalidSignature` | 12 | Not used: Xee does not sign promotional offers. |
+| `missingOfferParams` | 13 | Not used: Xee does not sign promotional offers. |
 | `invalidOfferPrice` | 14 | The offer's price is no longer valid. An offer must cost less than the product. |
 
 ### Purchases and products
