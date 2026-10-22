@@ -19,7 +19,7 @@ The bundle ID in App settings, iOS SDK must match your app: Xee rejects notifica
 
 ## Get the profile
 
-Call `Xee.getProfile()` when you need the current state, for example at launch or before opening a paid screen. It asks the server each time. If the server cannot be reached, it returns the cached profile instead.
+Call `Xee.getProfile()` when you need the current state, for example at launch or before opening a paid screen. It returns the saved profile when the server confirmed it in the last 5 minutes, and asks the server otherwise (see [The cached profile](#the-cached-profile)). If the server cannot be reached, it returns the saved profile instead.
 
 ```swift title="Swift" snippet="get-profile-async"
 do {
@@ -122,7 +122,19 @@ Task {
 
 ## The cached profile
 
-The SDK keeps the last profile it loaded on the device. `getProfile()` falls back to it when the server cannot be reached, and the delegate receives it at launch. You cannot read the cache directly; it is refreshed whenever the SDK loads the profile from the server.
+The SDK keeps the last profile it loaded on the device. `getProfile()` falls back to it when the server cannot be reached, and the delegate receives it at launch. It is refreshed by every purchase, restore and profile update, and by the SDK's own sync about once a minute while the app is open.
+
+`getProfile()` uses that saved profile without a network call when the server confirmed it less than 5 minutes ago. Pass `maxAge` (in seconds) to change that; `0` always asks the server:
+
+```swift snippet="get-profile-max-age"
+// Always ask the server, for example right before selling.
+let profile = try await Xee.getProfile(maxAge: 0)
+let premium = profile.accessLevels["premium"]?.isActive ?? false
+```
+
+The SDK asks the server anyway on the first call after launch, `identify` or `logout`, and when an access level the saved profile reports as active has reached its `expiresAt`, so access never outlives its end date. The trade-off: a change made on the server, such as a refund or access turned off in the dashboard, can reach the app up to `maxAge` late. Use `getProfile(maxAge: 0)` where you need the server's answer, for example when waiting for access to turn on after a purchase.
+
+Requires SDK 0.4.0 or later.
 
 ## Next steps
 

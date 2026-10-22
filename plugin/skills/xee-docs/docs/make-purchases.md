@@ -50,7 +50,7 @@ func buy(_ product: XeePaywallVariantProduct) async {
 /// Polls the profile until `premium` is on. It waits for Apple's notification when Xee could not check the purchase itself.
 func waitForPremium() async -> Bool {
     for _ in 0..<10 {
-        if let profile = try? await Xee.getProfile(),
+        if let profile = try? await Xee.getProfile(maxAge: 0),
            profile.accessLevels["premium"]?.isActive ?? false {
             return true
         }
