@@ -4,13 +4,14 @@ Guidance for Claude Code when working in this repository.
 
 ## What this repo is
 
-Six portable, Claude-style skills for agentic CLIs (Claude Code, Codex, Cursor, Gemini CLI and others), packaged as one plugin, `xee-skills`. They help with an iOS app that uses Xee, a self-hosted subscription backend:
+Seven portable, Claude-style skills for agentic CLIs (Claude Code, Codex, Cursor, Gemini CLI and others), packaged as one plugin, `xee-skills`. They help with an iOS app that uses Xee, a self-hosted subscription backend:
 
 - **`xee-integration`** adds the Xee SDK to an iOS app and wires activation, users, the paywall, purchases and subscription status. It reads the current docs page before writing each stage's code.
 - **`xee-migration`** moves a live app off Adapty, RevenueCat or hand-written StoreKit code onto Xee in phases, each with a way back. It inventories the old calls, writes a call-by-call plan for approval, and never removes the old SDK, switches purchasing or moves the notification URL without a yes at that step.
 - **`purchase-testing`** gets a first sandbox purchase through and diagnoses one that fails, checking Xee and the code before sending the person to a console.
 - **`paywall-tests`** moves a paywall's values into Xee variables, pushes versions without breaking a running test, proposes tests and reads results. It never starts a test.
 - **`paywall-sync`** brings Xee in step after the paywall's Swift code changed: it compares the view and its values with the latest version, rebuilds the preview, and pushes a new version after a yes.
+- **`view-tests`** makes onboarding and other screens without products testable: it finds the flow, plans its variables and `Xee.track` events (and the event that judges a test), edits the code and builds the preview after a yes, and pushes the view after a second yes. It never starts a test.
 - **`xee-docs`** routes a question to the right page of Xee's docs. The other skills point at it when they have no page for what is asked.
 
 ## Layout

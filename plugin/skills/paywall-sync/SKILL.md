@@ -9,8 +9,8 @@ description: >-
   the products, says what a push does to a running test, rebuilds the HTML preview from the code and
   pushes a new version after a yes. Never starts, ships or stops a test. Not for deciding what
   becomes a variable or new wording (`paywall-tests` mode A), proposing or reading tests
-  (`paywall-tests`), products or SDK setup (`xee-integration`), or explaining a Xee feature
-  (`xee-docs`).
+  (`paywall-tests`), products or SDK setup (`xee-integration`), explaining a Xee feature
+  (`xee-docs`), or onboarding and other screens without products (`view-tests`).
 ---
 
 # Paywall sync

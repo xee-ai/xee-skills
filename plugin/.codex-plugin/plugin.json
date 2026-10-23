@@ -1,7 +1,7 @@
 {
   "name": "xee-skills",
   "version": "0.1.0",
-  "description": "Skills that hand your app's subscription work to your agent: add the Xee SDK to an iOS app, move a live app off Adapty or RevenueCat in phases, get the first sandbox purchase through, find out why a purchase does not unlock access, turn a paywall into testable values and read test results, and answer a question straight from Xee's docs.",
+  "description": "Skills that hand your app's subscription work to your agent: add the Xee SDK to an iOS app, move a live app off Adapty or RevenueCat in phases, get the first sandbox purchase through, find out why a purchase does not unlock access, turn a paywall or an onboarding flow into testable values and read test results, and answer a question straight from Xee's docs.",
   "author": {
     "name": "Xee"
   },
@@ -20,7 +20,7 @@
   "interface": {
     "displayName": "Xee",
     "shortDescription": "Subscriptions and paywalls for iOS",
-    "longDescription": "Hand your iOS app's in-app purchase work to your agent. Add the Xee SDK and activate it, load a paywall's values from Xee, move a live app off Adapty or RevenueCat in phases, diagnose a sandbox purchase that does not go through or does not unlock access, turn a paywall into testable values and read test results, and get answers from Xee's docs. Needs a Xee server and its MCP connected.",
+    "longDescription": "Hand your iOS app's in-app purchase work to your agent. Add the Xee SDK and activate it, load a paywall's values from Xee, move a live app off Adapty or RevenueCat in phases, diagnose a sandbox purchase that does not go through or does not unlock access, turn a paywall or an onboarding flow into testable values and read test results, and get answers from Xee's docs. Needs a Xee server and its MCP connected.",
     "developerName": "Xee",
     "category": "Productivity",
     "capabilities": [

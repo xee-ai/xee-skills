@@ -29,6 +29,7 @@ Install the plugin once and you have every skill below.
 | [`purchase-testing`](#testing-a-purchase) | Gets your first sandbox purchase through. When one fails, it checks Xee and your code before sending you to a console, then names where it broke | Xee MCP |
 | [`paywall-tests`](#changing-and-testing-a-paywall) | Moves a paywall's copy and values into Xee, pushes new versions safely, suggests tests worth running, and reads the results | Xee MCP |
 | [`paywall-sync`](#after-you-change-the-paywall-code) | After you or your agent change the paywall's Swift code, compares it with Xee, rebuilds the dashboard preview and variables from the code, and pushes a new version | Xee MCP |
+| [`view-tests`](#testing-onboarding-and-other-views) | Makes onboarding and other screens without products testable: finds the flow, turns its copy into Xee values, adds analytics events with `Xee.track`, builds the preview of every screen and pushes the view | Xee MCP |
 | [`xee-docs`](#asking-the-docs) | Answers a question about Xee (an SDK method, a dashboard setting, an error code, what the MCP can do) from the right docs page | nothing |
 
 ## What you can ask
@@ -40,6 +41,7 @@ Say what you want the way you would brief a colleague. You do not need to name a
 - "My sandbox purchase went through but premium did not unlock. Why?"
 - "Make the headline on my paywall testable and push it to Xee."
 - "I changed the paywall code. Update it in Xee."
+- "Add onboarding for A/B test."
 - "What should I test on my paywall to convert better?"
 - "How is the test on the main paywall doing? Which arm is ahead?"
 - "What does error 2003 mean?"
@@ -176,6 +178,18 @@ I changed the paywall code. Update it in Xee.
 
 The skill reads the view and the struct that decodes its values, compares them with the latest version in Xee, and shows what differs: added, removed, renamed or changed variables, and what changed in the design. It says what the push does to a running test and to apps already installed, rebuilds the preview from the code, and pushes after your yes. If nothing differs, it pushes nothing.
 
+## Testing onboarding and other views
+
+A view is a screen or a flow that sells nothing, such as onboarding. Its values live in Xee like a paywall's, and a test on it is judged by an event your app sends, such as finishing the flow.
+
+```
+Add Onboarding for A/B test
+```
+
+The skill finds every screen of the flow, plans the values to make testable and the events to send (which screen appeared, whether the user finished or skipped), and shows you the plan before it changes anything. After your yes it edits the Swift code, builds a preview of every screen for the dashboard, and shows you the change; after a second yes it pushes the view to Xee. It can suggest a test, with the event that judges it, and read the results.
+
+**It never starts a test.** You start, stop and ship tests in the dashboard.
+
 ## Asking the docs
 
 ```
@@ -223,7 +237,7 @@ The skills are instructions. They run nothing on their own: everything below hap
 | **The Xee SDK package** | When `xee-integration` adds it to your project | Xcode or Swift Package Manager fetches `github.com/xee-ai/XeeSDK-iOS` |
 | **Your project files** | Reading code to find your paywall, purchase calls and Xcode scheme, and (for `xee-migration`) every call into the old SDK; editing it only after the plan you approve | Stay on your machine |
 
-`xee-integration`, `xee-migration` and `paywall-tests` edit your project's files; `paywall-sync` reads them and edits one only after you agree; `purchase-testing` and `xee-docs` only read them.
+`xee-integration`, `xee-migration`, `paywall-tests` and `view-tests` edit your project's files; `paywall-sync` reads them and edits one only after you agree; `purchase-testing` and `xee-docs` only read them.
 
 ## Privacy, license and support
 

@@ -85,6 +85,21 @@ The lints check that the skills are well formed. They cannot check that an agent
 **"Update Xee"** after the code's fallback for a value differs from what Xee serves.
 - Good: says that pushing it changes what installed apps show too, and asks which value is meant.
 
+## view-tests
+
+**"Add onboarding for A/B test."** in an app with a three-screen `TabView` onboarding.
+- Good: lists the three screens and their files, plans a few variables with today's values as defaults, proposes `onboarding_started`, `onboarding_step_viewed` (screen, step), `onboarding_finished` and `onboarding_skipped` with labels and a suggested goal, and stops for a yes before editing.
+- Bad: edits files before the yes, fetches the view on every screen, adds products, or renames the app's existing analytics calls.
+
+**"Yes, go ahead."** after the plan.
+- Good: loads the view once, reads each value with its default, logs the view once, sends each event at its point, adds the view to `XeePaywalls.json`, builds `html` with one `data-xee-screen` section per screen, shows the diff and what the push does, and stops for a second yes.
+
+**"Push it."** while a test runs on the welcome title and the new version drops `onboarding_finished`, the test's goal.
+- Good: says the test stops because its goal is no longer declared, before pushing.
+
+**"Suggest a test for the onboarding."**
+- Good: calls `propose_test` with the view's ID, one testable value, a reason and a declared goal; says it is a hypothesis.
+
 ## xee-docs
 
 **"What does error 2003 mean?"**
