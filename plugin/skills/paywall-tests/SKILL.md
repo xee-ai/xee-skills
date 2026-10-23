@@ -74,7 +74,7 @@ Verify against the live docs; these are the values to expect.
 | --- | --- |
 | Variable types | `string`, `int`, `double`, `bool`, `string_list` (JSON string, whole number, number, boolean, list of strings). An `int` default must be a whole number. |
 | Key | `^[a-z][a-z0-9_]{0,39}$`, unique in the version. Choose it once; a rename costs a running test. |
-| Limits | 100 variables, 500 KB of `html`. |
+| Limits | 100 variables, 500 KB of `html`. Images go up with `upload_image` (2 MB each) and do not count toward the 500 KB. |
 | `html` | A static preview of the view. Each element that shows a variable carries `data-xee="key"`. A marker with no matching variable refuses the push. A variable with no marker is allowed. |
 | `products` | Store product IDs in order; each must exist in the catalogue (`list_products`). |
 | `base_version` | The version you started from, 0 for a new paywall. If anyone pushed since, the push is refused and nothing is saved. |
@@ -368,16 +368,20 @@ writing a style:
   and with no parent color it is #3C3C43 at 60% (light) or #EBEBF5 at 60% (dark), as is
   `secondaryLabel`; `tertiaryLabel` is the same at 30%, `label` is #000/#FFF. A view that sets no
   background shows `systemBackground`.
-- An image asset (`Image("hero")`) is embedded as a `data:` URI (the dashboard allows no other
-  image source): take the asset's file from its `.imageset` (the dark-appearance file when its
-  `Contents.json` has one and you draw dark), scale it to twice the size it is drawn
-  at, and encode it as JPEG (PNG only when it needs transparency), for example
-  `sips -Z 260 hero.png --out /tmp/hero.jpg -s format jpeg` then base64. A PDF or SVG asset is
-  rasterized the same way (`sips -s format png`). Size it as the view does: `.resizable()` alone
-  stretches to the frame, `.aspectRatio(contentMode: .fill)` or `.scaledToFill()` is
+- An image asset (`Image("hero")`) is uploaded with `upload_image` and linked by the `url` it
+  returns (`<img src>` or a CSS `background-image`); the dashboard allows images only from that
+  host and `data:` URIs. Take the asset's file from its `.imageset` (the dark-appearance file when
+  its `Contents.json` has one and you draw dark) and scale it to twice the size it is drawn at,
+  as JPEG (PNG only when it needs transparency), for example
+  `sips -Z 260 hero.png --out /tmp/hero.jpg -s format jpeg`, then pass its base64 as `data`. A PDF
+  or SVG asset is rasterized to PNG first (`sips -s format png`); the tool takes PNG, JPEG, WebP
+  or GIF up to 2 MB. Upload each file once and reuse its url; the same file always gets the same
+  url, so a later push can link it again without uploading. If `upload_image` fails, inline the
+  file as a `data:` URI instead, keeping all inlined images well under the 500 KB `html` limit,
+  or draw a placeholder of the same size and say so. Size it as the view does: `.resizable()`
+  alone stretches to the frame, `.aspectRatio(contentMode: .fill)` or `.scaledToFill()` is
   `object-fit:cover`, `.fit` is `contain`; a template image (`.renderingMode(.template)`) takes its
-  `foregroundStyle` color. Keep all images together well under the 500 KB limit; if they cannot
-  fit, draw a placeholder of the same size and say so.
+  `foregroundStyle` color.
 - A named color (`.accent`, `Color("brand")`, `.blue1`) is in the asset catalog: read its
   `Contents.json` for the hex. Or it is defined in Swift (`static let accent = Color(hex:)`,
   `Color(light:dark:)`, a `UIColor` extension): take the value for the scheme you draw. Look for a

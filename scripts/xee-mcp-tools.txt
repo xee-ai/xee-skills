@@ -21,3 +21,4 @@ propose_test
 get_app
 set_translations
 set_languages
+upload_image

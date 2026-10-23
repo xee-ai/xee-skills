@@ -32,7 +32,7 @@ Each new key needs code that reads it, with today's value as its fallback, so it
 | Field | What it is |
 | --- | --- |
 | `base_version` | The version Claude started from (0 for a new paywall). If someone pushed after it, the push is refused as out of date and nothing is saved. |
-| `html` | A static preview of the view, up to 500 KB. Each element that shows a variable carries `data-xee="key"`. No scripts. The one outside link allowed is Google Fonts, so Claude uses the font your Swift view uses (or the closest one there). It fits one iPhone screen (390 by 844, fluid width, no scrolling) and shows one state: each variable at its default, never the variants stacked. |
+| `html` | A static preview of the view, up to 500 KB. Each element that shows a variable carries `data-xee="key"`. No scripts. It may load fonts from Google Fonts, so Claude uses the font your Swift view uses (or the closest one there), and images Claude stored with `upload_image`. It is one iPhone screen (390 by 844, fluid width); a view that scrolls scrolls inside that screen. It shows one state: each variable at its default, never the variants stacked. |
 | `products` | The store product IDs the paywall offers, in order. Each must be in the app's catalogue (`list_products`). |
 | `variables` | Up to 100. Each has a `key`, a `type` and a `default`. |
 

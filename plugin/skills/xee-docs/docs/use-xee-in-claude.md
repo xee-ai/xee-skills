@@ -121,6 +121,7 @@ Say the app and paywall by the IDs you see in the dashboard. A few to start with
 | `get_test_results` | The tests on a paywall or a view, with the numbers for each arm. A view test also shows its goal and, per arm, who reached it. |
 | `propose_test` | Suggests a test for you to start, on a paywall or a view (with the event that judges it). Claude never starts a test itself; you decide in the dashboard. |
 | `set_languages` | Sets the languages your paywalls and views are offered in (App settings › App Languages), usually from your app's String Catalog. Claude shows you the list and saves it after you say yes. |
+| `upload_image` | Stores an image from your app's assets (PNG, JPEG, WebP or GIF, up to 2 MB) for a paywall or view preview and returns its link, so the preview shows your real artwork. Anyone with the link can see the image. |
 | `set_translations` | Saves translations of your paywall and view texts into those languages, usually from your String Catalog, after you say yes. See [Localization](/docs/localization). |
 | `list_docs` | The pages of these docs. |
 | `get_doc` | One page of these docs, as Markdown. |
