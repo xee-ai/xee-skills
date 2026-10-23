@@ -12,6 +12,10 @@
     { "slug": "log-paywall-views", "nav": "Log paywall views", "title": "Log paywall views" },
     { "slug": "ab-tests", "nav": "A/B tests", "title": "A/B tests" }
   ] },
+  { "section": "Views & events", "pages": [
+    { "slug": "views", "nav": "Views", "title": "Views: test screens without products" },
+    { "slug": "track-events", "nav": "Track events", "title": "Track events" }
+  ] },
   { "section": "Integrate with AI", "pages": [
     { "slug": "use-xee-in-claude", "nav": "Use Xee in Claude", "title": "Use Xee in Claude" },
     { "slug": "claude-builds-paywall", "nav": "Let Claude build your paywall", "title": "Let Claude build your paywall" }

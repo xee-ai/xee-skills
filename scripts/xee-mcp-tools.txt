@@ -7,6 +7,10 @@ list_paywalls
 get_paywall
 create_paywall
 push_paywall_version
+list_views
+get_view
+create_view
+push_view_version
 list_products
 get_product
 create_product

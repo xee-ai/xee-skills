@@ -47,7 +47,9 @@ in it) or a 404. Use a slug from the table or from `list_docs`. If `list_docs` s
 | Customer user ID, login, logout, several devices | `identify-users` | `identify(_:withAppAccountToken:)`, anonymous vs identified profiles, `logout` |
 | Fetching a paywall, its values and products | `get-paywall` | `getPaywallVariant`, `remoteConfig`, fetch policies, `getPaywallVariantProducts` |
 | Counting paywall views | `log-paywall-views` | `logShowPaywallVariant`: when to call it, why tests need it, how to check views arrive |
-| A/B tests: start, split, what counts, results, ending | `ab-tests` | Arms and traffic, how a user is hashed into an arm, views and purchases counted, results, what happens on a new version |
+| A/B tests: start, split, what counts, results, ending | `ab-tests` | Arms and traffic, how a user is hashed into an arm, views and purchases counted, goals for view tests, results, what happens on a new version |
+| Views (onboarding and other screens without products), `getView`, `logShowView`, a view's versions and what Claude sends | `views` | What a view is, reading its values with the code's defaults, logging it, declared events, `push_view_version` fields |
+| Analytics events, `track`, `time`, event names and properties, the funnel | `track-events` | `Xee.track` and `Xee.time`, the naming and property rules, where events show, what Xee does not do |
 | Replacing Adapty or RevenueCat, moving subscribers | `migrate-to-xee` | Replacing Adapty/RevenueCat: call mapping, phases, existing subscribers |
 | What the Xee MCP is, how to connect it, its tool list | `use-xee-in-claude` | Token, `claude mcp add`, every MCP tool and what it does, Apple key roles for editing products, connection problems |
 | How Claude builds a paywall, version fields and rules | `claude-builds-paywall` | `push_paywall_version` fields, variable types and key rules, `base_version`, test carry-over rules, Swift code to read the values |

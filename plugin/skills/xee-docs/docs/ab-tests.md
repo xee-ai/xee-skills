@@ -83,11 +83,17 @@ It stops when the variable is removed, renamed, changes type or gets any other n
 
 A draft made on an older version cannot be started. Discard it and create the test again on the latest version.
 
+## Tests on a view
+
+A [view](/docs/views) has no products, so a test on one is judged by a **goal**: one of the events the view declares, picked when you create the test (the last one is chosen for you). For each arm, the results show **Saw the view** (users who logged the view during the test), **Reached** the goal (those of them who sent the goal event after their first view, during the test), the **Rate**, and the **Probability to be best**. Purchases and revenue are not shown.
+
+Everything else works as for a paywall: one running test per view, two arms, traffic from 5 to 95%, and the same rules when Claude pushes a new version, plus one: a test **stops** when the new version no longer declares its goal (*the goal event was removed in version N*).
+
 ## Claude's part
 
 Claude can read results with `get_test_results` and suggest a test with `propose_test`, but it never starts, ships or stops one.
 
-1. Claude sends the paywall, the variable and one or more values to try, with a reason. The value must fit the variable's type in the latest version.
+1. Claude sends the paywall or view, the variable and one or more values to try, with a reason. The value must fit the variable's type in the latest version. For a view, Claude also names the goal, one of the view's declared events.
 2. The suggestion appears in the dashboard under **Agent**.
 3. **Approve and launch** opens the new test page for that value, with the first suggested value as B. **Skip** sets it aside.
 4. You still choose **Create draft**, then **Start test**.

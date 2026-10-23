@@ -101,13 +101,17 @@ Say the app and paywall by the IDs you see in the dashboard. A few to start with
 | `get_paywall` | The latest version of a paywall: its variables with their current values, its products, and the test running on it. |
 | `create_paywall` | Creates an empty paywall with the ID the app will ask for and a name for the dashboard. Claude then gives it a first version with `push_paywall_version`. |
 | `push_paywall_version` | Sends a new version after Claude changes the paywall view: an HTML preview with `data-xee` markers, the products and the variables. |
+| `list_views` | An app's views (screens or flows without products, such as onboarding), with their latest version. |
+| `get_view` | The latest version of a view: its variables with their current values, its declared events, its screens, and the test running on it. |
+| `create_view` | Creates an empty view with the ID the app will ask for. Claude then gives it a first version with `push_view_version`. |
+| `push_view_version` | Sends a new version after Claude changes a view: an HTML preview with one section per screen, the variables, and the events the code sends. |
 | `list_products` | The app's product catalogue, for choosing which products a paywall shows. |
 | `get_product` | One product: what Xee keeps, and its status, US price and display names from App Store Connect. |
 | `create_product` | Adds a product to Xee. It does not create it in App Store Connect; make it there with the same product ID, then sync. |
 | `sync_products` | Reads products from App Store Connect into Xee, for the whole app or one product. |
 | `edit_product` | Changes a product's reference name, US price or a display name. With Sync with App Store Connect on, the change goes to Apple first; off, it stays in Xee. |
-| `get_test_results` | The tests on a paywall, with the numbers for each arm. |
-| `propose_test` | Suggests a test for you to start. Claude never starts a test itself; you decide in the dashboard. |
+| `get_test_results` | The tests on a paywall or a view, with the numbers for each arm. A view test also shows its goal and, per arm, who reached it. |
+| `propose_test` | Suggests a test for you to start, on a paywall or a view (with the event that judges it). Claude never starts a test itself; you decide in the dashboard. |
 | `list_docs` | The pages of these docs. |
 | `get_doc` | One page of these docs, as Markdown. |
 
