@@ -9,7 +9,7 @@ Open **App settings** and find **App Languages**:
 
 Removing a language keeps its translations, so adding it back restores them.
 
-Claude can fill the list from your app. Ask it to set your app's languages: it reads the languages of your String Catalog (or your Xcode project), shows you the list and saves it in Xee once you say yes. A language your app has that Xee does not list is named, so you can choose the closest one.
+Claude can fill the list from your app. Ask it to set your app's languages: it reads the languages of your String Catalog (or your Xcode project), shows you the list and saves it in Xee once you say yes. A language your app has that Xee does not list is saved as its closest listed one (Austrian German as German, Argentine Spanish as Latin American Spanish), and one with no related language is left out; Claude tells you which.
 
 ## Which language a user gets
 
