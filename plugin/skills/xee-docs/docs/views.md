@@ -2,7 +2,7 @@
 > Connect the Xee MCP (see [Use Xee in Claude](/docs/use-xee-in-claude)), open your iOS project in Claude Code and paste this prompt:
 >
 > ```prompt
-> Add the onboarding of this iOS app to Xee for A/B testing. Use the Xee MCP and the view-tests skill. First list my Xee apps and views, find every screen of the onboarding flow in this project, and show me a plan: the values to make testable, with today's values as defaults, the events to send with Xee.track, and the one that should judge a test. Stop after the plan. Ask me before you change the project, and again before you push the view to Xee. Never start a test.
+> Add the onboarding of this iOS app to Xee for A/B testing. Use the Xee MCP and the view-tests skill. First list my Xee apps and views, find every screen of the onboarding flow in this project, and show me a plan: the values to make testable, with today's values as defaults, the events to send with Xee.track, and the one that should judge a test. Stop after the plan. Ask me before you change the project, and again before you push the view to Xee. Never start a test. If the app is localized, read its String Catalog and offer translations for the languages my app offers in Xee; ask before saving them.
 > ```
 
 A view is a screen or a flow in your app that sells nothing, such as onboarding, a welcome tour or a permission prompt. Xee serves its values the way it serves a paywall's, so you can change them without a release and test them. A test on a view is judged by an event your app sends, such as `onboarding_finished`, not by purchases.
@@ -37,7 +37,7 @@ struct WelcomeScreen: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Text(config.string("welcome_title", default: "Trade smarter"))
+            Text(config.string("welcome_title", default: String(localized: "Trade smarter")))
                 .font(.largeTitle.bold())
             if config.bool("show_skip", default: true) {
                 Button("Skip") { Xee.track("onboarding_skipped") }
@@ -47,7 +47,7 @@ struct WelcomeScreen: View {
 }
 ```
 
-`Xee.getView(_:loadTimeout:)` never throws. When the view cannot load in time (no network at first launch, no version pushed yet), it returns a view whose values are all the code's defaults, so your screens always show. `loadTimeout` defaults to 2 seconds for views, because onboarding often runs at first launch; it cannot be less than 1.
+`Xee.getView(_:locale:loadTimeout:)` never throws. It asks for the language your app runs in; see [Localization](/docs/localization). When the view cannot load in time (no network at first launch, no version pushed yet), it returns a view whose values are all the code's defaults, so your screens always show. `loadTimeout` defaults to 2 seconds for views, because onboarding often runs at first launch; it cannot be less than 1.
 
 Read each value with the default your code would use without Xee: `config.string`, `config.int`, `config.double`, `config.bool` and `config.stringList`, the same types as a paywall's values. A list of screen IDs lets you test the order or the number of screens:
 

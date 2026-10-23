@@ -2,7 +2,7 @@
 > Connect the Xee MCP (see [Use Xee in Claude](/docs/use-xee-in-claude)), open your iOS project in Claude Code and paste this prompt:
 >
 > ```prompt
-> Make the paywall of this iOS app testable in Xee. Use the Xee MCP and the paywall-tests skill. First list my Xee apps, paywalls and products, find the paywall screen in this project, and show me a plan: the copy and values to turn into Xee variables, with today's values as defaults, and the products it shows. Stop after the plan. Ask me before you change the project, and again before you push the paywall to Xee. Never start a test.
+> Make the paywall of this iOS app testable in Xee. Use the Xee MCP and the paywall-tests skill. First list my Xee apps, paywalls and products, find the paywall screen in this project, and show me a plan: the copy and values to turn into Xee variables, with today's values as defaults, and the products it shows. Stop after the plan. Ask me before you change the project, and again before you push the paywall to Xee. Never start a test. If the app is localized, read its String Catalog and offer translations for the languages my app offers in Xee; ask before saving them.
 > ```
 
 Your paywall stays a normal SwiftUI view in your app. Xee keeps a copy of the values you might want to change without a release: the headline, the button text, which products show, whether the trial toggle is on. Claude moves those values out of the view and into Xee, and you test them from the dashboard.
@@ -23,7 +23,7 @@ For a paywall's first version, Claude reads the view and lists every value that 
 - **The default is what the screen shows today.** Claude picks which values become variables; it does not rewrite them. New wording is a test for later.
 - **Prices, periods, trial lengths and intro offers stay with the product** (`localizedPrice`, `subscriptionPeriod`, `subscriptionOffer`). A price typed into a variable goes stale and is wrong in other storefronts.
 - **Legal text, terms and privacy links, the restore button, and layout stay in code.**
-- **Text your app translates is still text.** Xee holds one set of values, so the variable holds the text in your source language, and the app shows it through its String Catalog: a text with a translation shows translated, one without shows as written. The dashboard shows the words, not a number. New wording reaches other languages once its translations are in the catalog in a build; until then those users see the source text.
+- **Text is still text, in your source language.** The variable holds the words, so the dashboard shows the words. Xee sends each user the translation for the language your app runs in, and Claude can fill translations from your String Catalog when you say yes. The code's default uses `String(localized:)`, so a user who is offline also sees their language. See [Localization](/docs/localization).
 
 Each new key needs code that reads it, with today's value as its fallback, so it only takes effect in a build with that code.
 

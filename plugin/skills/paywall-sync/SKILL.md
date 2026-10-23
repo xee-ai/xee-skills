@@ -73,8 +73,10 @@ If nothing differs, say "Xee already matches the code" and stop. Push nothing.
 
 Then check the code against the rules before you propose a push:
 
-- Every new key follows `paywall-tests` A2. In particular, a price is not a variable, and text the
-  app translates is a `string` holding the source-language text, never an `int` selector. If the
+- Every new key follows `paywall-tests` A2. In particular, a price is not a variable, and text is a
+  `string` holding the source-language text, read with a `String(localized:)` default, never an
+  `int` selector. A changed text has no translations yet: name the languages in `get_paywall`'s
+  `languages.offered` that will show the source text, and offer translations as A2 says. If the
   code breaks a rule, say which line and offer the fix; do not push the broken shape.
 - Every key is decoded with a fallback, and the paywall still works offline.
 - `Xee.logShowPaywallVariant` is still called once the view shows. Without it a test has no viewers.

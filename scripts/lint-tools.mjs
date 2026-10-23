@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { skillFiles, rel, list, finish } from "./shared.mjs";
 
 const known = new Set(list("xee-mcp-tools.txt"));
-const verbs = /^(list|get|push|create|sync|edit|propose)_[a-z_]+$/;
+const verbs = /^(list|get|push|create|sync|edit|propose|set)_[a-z_]+$/;
 const problems = [];
 const used = new Set();
 

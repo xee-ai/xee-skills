@@ -61,6 +61,6 @@ Each change saves a new version with the same preview and values. The page does 
 
 Older versions are read only.
 
-## Text your app translates
+## Text in other languages
 
-Xee holds one set of values for every language. If your paywall's text is translated in your app, Claude does not save the text itself as a value: it saves a choice between versions of the text that your app translates, so every language keeps its own wording.
+Pick the languages your app offers under **App settings › Languages**. Each text value is translated once, by its words, and your app gets the translation for the language it runs in. A text with no translation shows in your source language. On a paywall's page, a tab per language shows the preview in that language and lets you edit its translations. See [Localization](/docs/localization).

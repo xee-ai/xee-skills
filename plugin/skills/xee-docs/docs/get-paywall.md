@@ -42,7 +42,7 @@ Xee.getPaywallVariant(paywallId: "main") { result in
 | `paywallId` | required | The paywall ID you set in the dashboard. |
 | `fetchPolicy` | `.reloadRevalidatingCacheData` | Whether the SDK asks the server first or reads its cache first. See below. |
 | `loadTimeout` | 5 seconds | How long to wait for the server. When it runs out, you get the cached copy if there is one. It cannot be less than 1 second. |
-| `locale` | none | Leave it out. Xee holds one set of values per paywall. |
+| `locale` | the app's language | Leave it out: text comes in the language your app runs in, when you offer it in Xee, otherwise in your source language. Pass a code such as `fr` only to show the paywall in another language. |
 
 The SDK keeps the last paywall it received on the device, and the copy survives app restarts. If the server cannot be reached and there is a cached copy, you get that copy. If there is none, the call throws, so keep working defaults in your code. It also throws when the paywall ID does not exist, the paywall is inactive, or it has no version yet.
 

@@ -81,7 +81,7 @@ Verify against the live docs; these are the values to expect.
 | Refused push | All problems are listed at once; nothing is saved. Fix them all and push again. |
 | Accepted push | Returns a report: `version`, `added`, `unchanged`, `changed`, `removed`, `tests_moved`, `tests_stopped`. Read it back to the user. |
 | Tests | One variable per test, two arms (A is what is served today, B is the new value, 5 to 95% traffic), one running test per paywall. Only builds made for the latest version take part. |
-| Localization | Xee holds one set of values per paywall. It has no per-language values. |
+| Languages | An app has a source language and offered languages (`get_paywall` → `languages`); the person picks them in the dashboard. Each text is translated once, by its exact words, and the app gets the translation for the language it runs in. With offered languages, each text value and test arm has `translations` and `missing` (languages where users see the source text). `set_translations` saves translations. A test cannot start while B lacks a translation A has. |
 
 `get_paywall` returns for each variable its `default` (what the last push set) and `current` (what
 is served now: the default, or a winner the person shipped) and `testable`, plus `products` and
@@ -136,15 +136,15 @@ expresses it. Leave it in code when:
   price typed into a string variable goes stale and is wrong in other storefronts. Variable
   copy may be a template whose numbers the code fills in from the product, never the number itself.
 - **Legal and billing disclosures**, terms and privacy links, restore button, required text.
-- **Strings the app localizes stay text.** Make them a `string` whose default is today's text in
-  the source language, and have the code show it through the app's catalog:
-  `Bundle.main.localizedString(forKey: value, value: value, table: nil)`. A text the catalog has
-  shows translated; one it lacks shows as written. Never a numbered selector (`headline_variant`,
-  `0` = today's text): the dashboard then shows `0` instead of the words, and nobody can read a
-  test. If the catalog's keys are identifiers (`paywall.title`), not the source text, add the
-  source text as a key for each such string, and say so in the plan. At the confirm point, say
-  that new wording reaches other languages only once its translations are in the catalog in a
-  build; until then those users see the source text.
+- **Text stays text, in the source language.** Make it a `string` whose default is today's text
+  in the app's source language, read with a default the catalog translates:
+  `config.string("headline", default: String(localized: "Unlock everything"))`. Xee already sends
+  the value in the app's language when it is offered and translated, so the code shows the value
+  as it comes. The dashboard shows the words, so a test stays readable; a numbered selector
+  (`headline_variant`, `0` = today's text) would show `0`. If the app has a String Catalog
+  (`*.xcstrings`), read each pushed text's translations from it and, at confirm point 2, offer to
+  save them with `set_translations` for the languages in `languages.offered`. Name any language
+  the catalog has that Xee does not offer: the person adds it under App settings › Languages.
 - **Layout the code owns** (spacing, fonts). A variable controls what a value says or whether a
   block shows, not a pixel.
 
@@ -261,8 +261,8 @@ classes), take the ones that phone gets.
 - If the view still reads the old SDK (other keys or IDs), or reads fewer keys than Xee holds,
   take the copy from Xee's defaults and the look from the code, and tell the person which
   variables this build does not read yet.
-- If the version you start from already breaks a rule in A2 (translated text held as a text
-  variable, a price in a string), say so at the confirm point and offer the fix. Do not change it
+- If the version you start from already breaks a rule in A2 (a numbered selector for text, a
+  price in a string), say so at the confirm point and offer the fix. Do not change it
   silently in the same push.
 - Controls drawn as iOS draws them, never left out. A `Toggle` is a switch at the right end of its
   row, its label on the left (`display:flex; justify-content:space-between`), 51 by 31 with a white
@@ -333,7 +333,8 @@ latest version. If they want to test now, go to mode B.
    them one value (a `bool` or an index that switches a set of copy) or sequence two tests.
 5. Check feasibility. Does the variable exist in the latest version? If not, it needs mode A and a
    build first; list it as such. Do B's values fit the type? Is a trial or offer involved? Then the
-   product must really carry it for eligible users.
+   product must really carry it for eligible users. Is A translated (its `translations`)? Then B
+   needs the same languages before the test can start; write them with the candidate.
 6. Rank by: how central the element is to the decision (plans, price display and the button
    before headline before decoration) times how clear the problem is on this screen, divided by
    effort and risk. Show 3 to 5.
@@ -348,7 +349,8 @@ what you would run first and why it is first.
 
 **Confirm point 3.** Propose with `propose_test` only the ones the person asked for or agreed to
 (`app`, `paywall`, `key`, `values` as a non-empty list of the variable's type, `why` as the reason in
-one or two sentences someone can judge). The tool checks that the variable exists in the latest
+one or two sentences someone can judge). When B needs translations, show them beside B and save
+them with `set_translations` in the same yes, before `propose_test`. The tool checks that the variable exists in the latest
 version and that the values fit its type; fix and retry on a refusal. The suggestion appears in the
 dashboard under **Agent**. After proposing, tell them how it goes on: **Approve and launch** opens
 the new test page with the first value as B; they still choose **Create draft** and then

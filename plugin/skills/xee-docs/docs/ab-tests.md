@@ -21,6 +21,8 @@ Only one test runs on a paywall at a time. The variables come from your app's co
 
 Creating or starting a test is refused when Claude has pushed a newer version since you opened the page, or when another test is already running on the paywall. Start the test again on the latest version, or stop the running one first.
 
+If your app offers [other languages](/docs/localization) and A is translated into some of them, the form asks for B in those languages too. A test cannot start until B has every translation A has, so users in each language see both arms in their own language.
+
 ## How users are split
 
 When a test is running, the server sends the SDK one variation per arm, each with the paywall's values, the arm's value in place of the tested one, and the arm's weight. The device picks one:

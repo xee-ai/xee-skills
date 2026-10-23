@@ -137,7 +137,8 @@ Change nothing before it.
   defaults at once and apply the view when it arrives, before the first screen appears. **The flow
   must work with no network** and on a first launch: `getView` returns the code's defaults then.
 - Read each variable through `view.config.<type>("key", default:)`, with the default equal to the
-  planned one. If `screen_order` is a variable, build the screens from it, skip unknown IDs and keep
+  planned one; a text's default is `String(localized: "…")` (`paywall-tests` A2). `Xee.getView`
+  already asks for the language the app runs in. If `screen_order` is a variable, build the screens from it, skip unknown IDs and keep
   the code's order for the rest.
 - Call `await Xee.logShowView(view)` once, when the first screen appears, and `Xee.track` at each
   planned point. Send each event once per time it happens (`.task` or `onAppear` guarded, not in
