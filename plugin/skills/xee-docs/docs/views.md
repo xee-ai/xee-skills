@@ -1,3 +1,10 @@
+> [!NOTE] Add a view using Claude
+> Connect the Xee MCP (see [Use Xee in Claude](/docs/use-xee-in-claude)), open your iOS project in Claude Code and paste this prompt:
+>
+> ```prompt
+> Add the onboarding of this iOS app to Xee for A/B testing. Use the Xee MCP and the view-tests skill. First list my Xee apps and views, find every screen of the onboarding flow in this project, and show me a plan: the values to make testable, with today's values as defaults, the events to send with Xee.track, and the one that should judge a test. Stop after the plan. Ask me before you change the project, and again before you push the view to Xee. Never start a test.
+> ```
+
 A view is a screen or a flow in your app that sells nothing, such as onboarding, a welcome tour or a permission prompt. Xee serves its values the way it serves a paywall's, so you can change them without a release and test them. A test on a view is judged by an event your app sends, such as `onboarding_finished`, not by purchases.
 
 Claude adds views for you: ask it in your Xcode project, for example *add Onboarding for A/B test*. This page shows what the code looks like and what Xee keeps.

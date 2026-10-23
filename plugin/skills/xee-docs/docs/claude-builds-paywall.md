@@ -1,7 +1,11 @@
-Your paywall stays a normal SwiftUI view in your app. Xee keeps a copy of the values you might want to change without a release: the headline, the button text, which products show, whether the trial toggle is on. Claude moves those values out of the view and into Xee, and you test them from the dashboard.
+> [!NOTE] Make your paywall testable using Claude
+> Connect the Xee MCP (see [Use Xee in Claude](/docs/use-xee-in-claude)), open your iOS project in Claude Code and paste this prompt:
+>
+> ```prompt
+> Make the paywall of this iOS app testable in Xee. Use the Xee MCP and the paywall-tests skill. First list my Xee apps, paywalls and products, find the paywall screen in this project, and show me a plan: the copy and values to turn into Xee variables, with today's values as defaults, and the products it shows. Stop after the plan. Ask me before you change the project, and again before you push the paywall to Xee. Never start a test.
+> ```
 
-> [!TIP]
-> Connect Claude to Xee first: see [Use Xee in Claude](/docs/use-xee-in-claude). Then run Claude in your app's project folder.
+Your paywall stays a normal SwiftUI view in your app. Xee keeps a copy of the values you might want to change without a release: the headline, the button text, which products show, whether the trial toggle is on. Claude moves those values out of the view and into Xee, and you test them from the dashboard.
 
 ## How a change goes
 
