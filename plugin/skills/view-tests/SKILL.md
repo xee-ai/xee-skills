@@ -176,7 +176,9 @@ sentence that a push reaches installed builds made for the latest version at onc
 
 Call `push_view_version` with `app`, `view`, `base_version`, `html`, `variables` (`key`, `type`,
 `default`, plus `renamed_from` where it applies) and `events` (`event`, `match` when narrowed,
-`label`). A new view needs no `create_view` first: the first push creates it.
+`label`, and `goal: true` on the suggested goal, on exactly one event). The goal is saved with the
+view: the dashboard's new-test form and `propose_test` default to it, so the person does not have to
+pick it. A new view needs no `create_view` first: the first push creates it.
 
 - **Conflict**: call `get_view` again, redo the change on the new version, show what changed under
   you, and ask again.
@@ -218,7 +220,7 @@ End with a short note, in the person's language, built from what happened:
 - After a push: "I pushed version N of `onboarding`: [screens, variables and events]. [No test was
   running / The test on the welcome title carries on / stops: …] The view is under Views in the
   dashboard. [New code needs a build before it reaches users.] To test a value, start it from the
-  view's page; I never start a test."
+  view's page; tests are judged by [goal label] unless you pick another goal. I never start a test."
 - After a proposal: "I've suggested [test], judged by [goal label], under Agent in the dashboard.
   Open it, choose Approve and launch, then Create draft and Start test when you are ready."
 - After reading results: "[The grade, one sentence.] Shipping A or B, or stopping the test, is

@@ -75,7 +75,7 @@ Claude pushes a version with the `push_view_version` tool:
 | --- | --- |
 | `html` | A static preview of every screen: one `<section data-xee-screen="welcome">` per screen (1 to 20, IDs in snake case, each once), with `data-xee="key"` on each element that shows a value. The dashboard shows the screens side by side, each one iPhone screen. |
 | `variables` | Key, type and default, as for a paywall: `string`, `int`, `double`, `bool`, `string_list`. |
-| `events` | 1 to 30 steps, in funnel order. Each has `event` (the name the code sends), an optional `match` of up to 3 properties that narrows it (for example `{ "screen": "goals" }`), and a `label` of 1 to 60 characters for the dashboard. |
+| `events` | 1 to 30 steps, in funnel order. Each has `event` (the name the code sends), an optional `match` of up to 3 properties that narrows it (for example `{ "screen": "goals" }`), and a `label` of 1 to 60 characters for the dashboard. One step may have `"goal": true`: new tests on the view are judged by it unless you pick another goal; without it, by the last step. |
 | `products` | None. A view has no products. |
 
 A running test carries on into a new version by the same rules as a paywall's (see [A/B tests](/docs/ab-tests)), and it also stops when the new version no longer declares its goal.
