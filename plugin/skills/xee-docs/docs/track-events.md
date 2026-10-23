@@ -8,7 +8,7 @@ Xee.track("onboarding_step_viewed", properties: ["screen": "goals", "step": 2])
 Xee.track("onboarding_notifications_allowed", properties: ["granted": true])
 ```
 
-`track` never throws and never waits. The event is saved on the device and sent in the background with the SDK's other events, and sent again if the network fails. Events sent before `Xee.activate` are dropped.
+`track` never throws and never waits. Events keep the order of the calls. Each is saved on the device and sent in the background with the SDK's other events: a few seconds after it happens, in a compressed batch, again later if the network fails (waiting longer after each failure, up to ten minutes), and at once when the app goes to the background. Events sent before `Xee.activate` are held, up to 200, and sent once it is called.
 
 ## Time a flow
 
@@ -19,6 +19,10 @@ Xee.track("onboarding_finished")  // carries duration_ms, the milliseconds since
 ```
 
 `Xee.time(_:)` starts a timer for an event name. The next `track` of that name carries `duration_ms`, the milliseconds since `time`, and clears the timer. Timers live in memory: a cold start forgets them.
+
+## Let a person opt out
+
+`Xee.optOutTracking()` stops `track` on this device until `Xee.optInTracking()`: new events are not kept and events not sent yet are deleted. The choice is remembered across launches; `Xee.hasOptedOutTracking` reads it. Paywall views and purchases are not affected: A/B tests and access need them.
 
 ## Rules
 
