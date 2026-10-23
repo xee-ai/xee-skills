@@ -20,3 +20,4 @@ get_test_results
 propose_test
 get_app
 set_translations
+set_languages

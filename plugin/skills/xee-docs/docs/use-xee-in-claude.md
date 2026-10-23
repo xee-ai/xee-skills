@@ -1,20 +1,11 @@
 Xee has an MCP server. Once Claude Code is connected to it, Claude can read your paywalls, change their design and values, push a new version to Xee, and look at test results, without you leaving the editor. Install the Xee skills as well, and Claude knows how to add the SDK to your app, test a purchase and run paywall tests too.
 
-## 1. Make a token
+## 1. Add Xee to Claude Code
 
-Open [Settings, MCP](/settings?tab=mcp), choose **Add token**, name it after where you will use it (for example MacBook) and create it.
-
-The token is shown once, with the command for step 2 already filled in. Only a hash is kept, so if you lose it, revoke it and make a new one. A token can reach every app you own.
-
-> [!IMPORTANT]
-> Tokens act as you. Keep them out of code and chats, and revoke any you no longer use.
-
-## 2. Add Xee to Claude Code
-
-Run this in a terminal, with your token in place of `YOUR_TOKEN`:
+Run this in a terminal:
 
 ```bash
-claude mcp add --transport http xee {{server}}/mcp --header "Authorization: Bearer YOUR_TOKEN"
+claude mcp add --transport http xee {{server}}/mcp
 ```
 
 It is saved for the project you ran it in. Add `--scope user` to use Xee in every project.
@@ -22,9 +13,26 @@ It is saved for the project you ran it in. Add `--scope user` to use Xee in ever
 > [!TIP]
 > Run it in your app's project folder, so Claude can see your paywall code and Xee together.
 
+## 2. Sign in with your browser
+
+Start Claude Code and run `/mcp`. Choose `xee`, then **Authenticate**. Your browser opens: sign in to Xee, check what Claude is asking for, and choose **Approve**. Go back to the terminal, where `xee` now shows as connected.
+
+Claude Code keeps the sign-in and renews it for you. You never copy a token. Signing in gives Claude access to every app you own, as you. To take it away, remove it with `claude mcp remove xee`.
+
+### Connect with a token instead
+
+For a machine with no browser, a script or another tool, use a token. Open [Settings, MCP](/settings?tab=mcp), choose **Add token**, name it after where you will use it (for example CI) and create it. It is shown once, with the command already filled in; only a hash is kept, so if you lose it, revoke it and make a new one. Run:
+
+```bash
+claude mcp add --transport http xee {{server}}/mcp --header "Authorization: Bearer YOUR_TOKEN"
+```
+
+> [!IMPORTANT]
+> Tokens act as you. Keep them out of code and chats, and revoke any you no longer use.
+
 ## 3. Check that it works
 
-Start Claude Code and run `/mcp`. `xee` should be listed as connected. You can also run this in a terminal:
+Run `/mcp` in Claude Code. `xee` should be listed as connected. You can also run this in a terminal:
 
 ```bash
 claude mcp list
@@ -96,7 +104,7 @@ Say the app and paywall by the IDs you see in the dashboard. A few to start with
 | Tool | What it does |
 | --- | --- |
 | `list_apps` | The apps you own in Xee, each with its public SDK key, bundle ID, Apple app ID and `in_app_purchase_key`: `true` when the In-App Purchase key is set, which is what lets the server check purchases with Apple. |
-| `get_app` | One app's setup values: the same as its entry in `list_apps`, `in_app_purchase_key` included. |
+| `get_app` | One app's setup values: the same as its entry in `list_apps`, `in_app_purchase_key` included, and its languages. |
 | `list_paywalls` | An app's paywalls, with whether each is live and its latest version. |
 | `get_paywall` | The latest version of a paywall: its variables with their current values, its products, and the test running on it. |
 | `create_paywall` | Creates an empty paywall with the ID the app will ask for and a name for the dashboard. Claude then gives it a first version with `push_paywall_version`. |
@@ -112,6 +120,8 @@ Say the app and paywall by the IDs you see in the dashboard. A few to start with
 | `edit_product` | Changes a product's reference name, US price or a display name. With Sync with App Store Connect on, the change goes to Apple first; off, it stays in Xee. |
 | `get_test_results` | The tests on a paywall or a view, with the numbers for each arm. A view test also shows its goal and, per arm, who reached it. |
 | `propose_test` | Suggests a test for you to start, on a paywall or a view (with the event that judges it). Claude never starts a test itself; you decide in the dashboard. |
+| `set_languages` | Sets the languages your paywalls and views are offered in (App settings › App Languages), usually from your app's String Catalog. Claude shows you the list and saves it after you say yes. |
+| `set_translations` | Saves translations of your paywall and view texts into those languages, usually from your String Catalog, after you say yes. See [Localization](/docs/localization). |
 | `list_docs` | The pages of these docs. |
 | `get_doc` | One page of these docs, as Markdown. |
 
@@ -127,8 +137,8 @@ Xee reads and edits your products through an App Store Connect API key. Reading 
 
 ## If it does not work
 
-- **xee is not connected, or Claude says unauthorized.** The token was typed wrong or has been revoked. Check [Settings, MCP](/settings?tab=mcp), make a new token, then run `claude mcp remove xee` and add it again.
+- **xee is not connected, or Claude says unauthorized.** Run `/mcp`, choose `xee` and authenticate again. If you connected with a token, it was typed wrong or has been revoked: check [Settings, MCP](/settings?tab=mcp), make a new token, then run `claude mcp remove xee` and add it again.
 - **Cannot connect.** The address in the command must be `{{server}}/mcp`, not the dashboard's address.
 - **"The key is not allowed to do this (403)" when editing a product.** The App Store Connect key has the wrong role. Make a new key with App Manager or Admin access, as above.
-- **Claude cannot see the app.** A token reaches only the apps of the account that made it.
+- **Claude cannot see the app.** Claude reaches only the apps of the account you signed in with, or that made the token.
 - **A push is refused as out of date.** Someone pushed a newer version. Ask Claude to read the paywall again and redo the change on top of it.

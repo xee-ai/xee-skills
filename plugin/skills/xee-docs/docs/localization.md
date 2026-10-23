@@ -2,12 +2,14 @@ Xee can show each paywall's and view's text in the language your app runs in. Yo
 
 ## Choose languages
 
-Open **App settings** and find **Languages**:
+Open **App settings** and find **App Languages**:
 
 - **Source language**: the language your values are written in, English unless you change it. Claude writes values in it.
 - **Offered in**: the languages your users can get. Choose **Add languages**, tick them in the list (popular ones first, then every language A to Z) and save.
 
 Removing a language keeps its translations, so adding it back restores them.
+
+Claude can fill the list from your app. Ask it to set your app's languages: it reads the languages of your String Catalog (or your Xcode project), shows you the list and saves it in Xee once you say yes. A language your app has that Xee does not list is named, so you can choose the closest one.
 
 ## Which language a user gets
 

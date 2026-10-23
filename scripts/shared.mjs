@@ -6,12 +6,13 @@ import { fileURLToPath } from "node:url";
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 export const SKILLS = join(ROOT, "plugin", "skills");
 
-/** Every file under `dir`, skipping what is never published. */
+/** Every file under `dir`, skipping what is never published. CI checks the SDK out into `sdk/`. */
 export function walk(dir = ROOT) {
   const out = [];
   for (const name of readdirSync(dir)) {
     if ([".git", "node_modules", ".DS_Store"].includes(name)) continue;
     const p = join(dir, name);
+    if (p === join(ROOT, "sdk")) continue;
     if (statSync(p).isDirectory()) out.push(...walk(p));
     else out.push(p);
   }

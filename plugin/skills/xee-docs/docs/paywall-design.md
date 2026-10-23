@@ -63,4 +63,4 @@ Older versions are read only.
 
 ## Text in other languages
 
-Pick the languages your app offers under **App settings › Languages**. Each text value is translated once, by its words, and your app gets the translation for the language it runs in. A text with no translation shows in your source language. On a paywall's page, a tab per language shows the preview in that language and lets you edit its translations. See [Localization](/docs/localization).
+Pick the languages your app offers under **App settings › App Languages**. Each text value is translated once, by its words, and your app gets the translation for the language it runs in. A text with no translation shows in your source language. On a paywall's page, a tab per language shows the preview in that language and lets you edit its translations. See [Localization](/docs/localization).

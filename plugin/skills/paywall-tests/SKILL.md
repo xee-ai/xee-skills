@@ -81,7 +81,7 @@ Verify against the live docs; these are the values to expect.
 | Refused push | All problems are listed at once; nothing is saved. Fix them all and push again. |
 | Accepted push | Returns a report: `version`, `added`, `unchanged`, `changed`, `removed`, `tests_moved`, `tests_stopped`. Read it back to the user. |
 | Tests | One variable per test, two arms (A is what is served today, B is the new value, 5 to 95% traffic), one running test per paywall. Only builds made for the latest version take part. |
-| Languages | An app has a source language and offered languages (`get_paywall` → `languages`); the person picks them in the dashboard. Each text is translated once, by its exact words, and the app gets the translation for the language it runs in. With offered languages, each text value and test arm has `translations` and `missing` (languages where users see the source text). `set_translations` saves translations. A test cannot start while B lacks a translation A has. |
+| Languages | An app has a source language and offered languages (`get_paywall` → `languages`, also in `get_app`); the person picks them in the dashboard, or `set_languages` saves the list after a yes. Each text is translated once, by its exact words, and the app gets the translation for the language it runs in. With offered languages, each text value and test arm has `translations` and `missing` (languages where users see the source text). `set_translations` saves translations. A test cannot start while B lacks a translation A has. |
 
 `get_paywall` returns for each variable its `default` (what the last push set) and `current` (what
 is served now: the default, or a winner the person shipped) and `testable`, plus `products` and
@@ -143,8 +143,10 @@ expresses it. Leave it in code when:
   as it comes. The dashboard shows the words, so a test stays readable; a numbered selector
   (`headline_variant`, `0` = today's text) would show `0`. If the app has a String Catalog
   (`*.xcstrings`), read each pushed text's translations from it and, at confirm point 2, offer to
-  save them with `set_translations` for the languages in `languages.offered`. Name any language
-  the catalog has that Xee does not offer: the person adds it under App settings › Languages.
+  save them with `set_translations` for the languages in `languages.offered`. If the catalog has
+  languages Xee does not offer yet, offer at the same point to add them with `set_languages`
+  (the whole list: today's `languages.offered` plus the catalog's, without `Base` and the source
+  language); after a yes, save the languages first, then the translations.
 - **Layout the code owns** (spacing, fonts). A variable controls what a value says or whether a
   block shows, not a pixel.
 
