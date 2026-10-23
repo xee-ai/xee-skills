@@ -155,7 +155,8 @@ fonts, colors, controls as iOS draws them, read what the view calls), with these
 - One `<section data-xee-screen="<id>">` per screen, as children of one wrapper, in the order the
   code shows them by default. The dashboard draws each section as one 390 by 844 iPhone screen,
   side by side. Each section is a screen on its own: give it the screen's background and a
-  `min-height:844px`.
+  `min-height:844px`. A screen with a `ScrollView` uses A6's scroller with `height:844px` in
+  place of `100vh`.
 - `data-xee` on the element that shows each variable, on whichever screen shows it. A variable that
   no screen shows (`screen_order`, a delay) has no marker.
 - A screen the default order leaves out is not drawn. A system prompt (notifications, tracking) is

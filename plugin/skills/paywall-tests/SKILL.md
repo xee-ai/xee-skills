@@ -226,7 +226,8 @@ stops the headline test; no winner is applied"); and the production sentence fro
 
 **Build `html`** before the summary, so the person can see the preview you will push: a static,
 self-contained preview of the view (`style` attributes or one `<style>` block, no CSS file, no
-scripts, no user data), with `data-xee` on every element that shows a variable.
+scripts, no user data), with `data-xee` on every element that shows a variable. Write a fragment
+(the font `<link>`, the `<style>`, the root `div`): the dashboard puts it inside its own `<body>`.
 
 **Size and state.** The dashboard shows `html` in a 390 by 844 frame, one iPhone screen, with no
 page margin. SwiftUI points are CSS pixels, so copy the view's sizes as they are. Draw it for a
@@ -235,8 +236,30 @@ classes), take the ones that phone gets.
 
 - Fluid width: the root is `width:100%` and `min-height:100vh` with `box-sizing:border-box`, never
   a fixed pixel width. Long text wraps instead of running off the edge.
-- One screen, no scrolling, the way the view fits on the phone. If the real view scrolls, show
-  what is visible before the user scrolls.
+- The page is one screen: the dashboard hides anything past 844. A view that fits draws as it
+  fits. **A view with a `ScrollView`** keeps all of its content, in a scroller inside the page,
+  which the dashboard scrolls without scripts:
+  `<div style="height:100vh;overflow-y:auto;scrollbar-width:none">` (with
+  `::-webkit-scrollbar{display:none}` when the view hides its indicators). Its first paint is
+  what the user sees before scrolling. Everything outside the `ScrollView` stays fixed outside the
+  scroller, `position:absolute` over it: a `.safeAreaInset` bar, a close button, a `ZStack`
+  layer. Give the scroller's content the safe-area top padding plus the view's own, and bottom
+  padding as tall as a pinned bar, so its last row can scroll clear of the bar. When the bar is
+  not laid over the `ScrollView` but stacked under it in the same `VStack`, the root is a flex
+  column of `height:100vh`, the scroller `flex:1;min-height:0` and the bar a plain sibling below
+  it. Repeated content (the plans drawn twice) is drawn twice; mark the first copy only.
+- A `Spacer()` is `flex:1` in the stack's flex column or row; several share the space equally,
+  and the stack's `spacing` still applies on each side of it.
+- A horizontal `ScrollView` (a carousel of reviews) is a row with `overflow-x:auto` and the
+  scrollbar hidden, all its items in it, scrolled to the start. A `TabView` with
+  `.tabViewStyle(.page)` is the same row with each page full width, plus its page dots centered
+  under it (the first one current) unless the code hides them.
+- In a workspace with several modules, a name used by the view (`Color.main`, `LoadingView`) is
+  the one the view's module can see: public in an imported module, or in its own target. Match it
+  by the call's argument labels when two exist, and trust a file only if its target compiles it
+  (it is in that target's sources in `project.pbxproj`, or under a synchronized folder).
+- `.hidden()` keeps the view's space but draws nothing (`visibility:hidden`); `.lineLimit(n)` above
+  1 clamps the text to `n` lines (`-webkit-line-clamp:n`).
 - Leave the iPhone's safe areas: 59 px at the top for the status bar and 34 px at the bottom for
   the home indicator, unless the view's content ignores the safe area (a background that does is
   not enough).
@@ -245,7 +268,20 @@ classes), take the ones that phone gets.
   other has its number in the dashboard's list only. A block that shows only in one state (trial
   on or off) is shown as it is at its default. Something that appears after a delay (a skip
   button) is drawn as it looks once shown, and carries the marker of the variable that sets the
-  delay. Put a marker on the element itself (the "Skip" label), never on the row or stack around it.
+  delay; with no such variable it has no marker. Put a marker on the element itself (the "Skip"
+  label, or the icon when there is no label), never on the row or stack around it. A
+  `string_list` is the one exception: its marker goes on the stack that holds the items.
+- A layout or value the view takes from the old SDK's remote config (`paywall.config["first"]`,
+  `remoteConfig["skipAfter"]`) is not in the code: ask the person what their live paywall
+  sends, and draw the code's fallback only when they do not know. Ask only about keys the drawn
+  view's code path reads.
+- Each piece of the default state comes from its own `@State` default and what `onAppear` or
+  `.task` sets: a free-trial toggle that starts off selects the plan without a trial even when
+  another plan has one. An `@AppStorage` value an earlier launch saved is drawn at its declared
+  default (a first launch); say which way a returning user sees it.
+- A background that ignores the bottom safe area (`.ignoresSafeArea(edges: .bottom)`, a negative
+  `.padding(.bottom, -safeArea)`) runs to the screen's bottom edge while the control's content
+  stays above the 34 px: add 34 px to its bottom padding and pull it down by the root's.
 - **Which product has a trial or intro offer** decides the default state (headline, toggle,
   selected plan, the trial line). No Xee tool returns it. Look for a `.storekit` file or the
   product IDs in the code; if neither says (a check at runtime, such as `product.trialDays`, does
@@ -257,8 +293,12 @@ classes), take the ones that phone gets.
 - `.lineLimit(1)` with `.minimumScaleFactor`: keep the line on one line (`white-space:nowrap`) and
   lower its font size just enough to fit the width left after the padding, never below size times
   the factor. Other long text wraps.
-- Text with no color set follows the color scheme: check `.preferredColorScheme`,
-  `UIUserInterfaceStyle` in `Info.plist`, or the screen's background. On a dark screen it is white.
+- **The color scheme** is the app's when it forces one, whatever the device or the person says
+  (tell them which wins):
+  `.preferredColorScheme`, `UIUserInterfaceStyle` in `Info.plist`, or
+  `INFOPLIST_KEY_UIUserInterfaceStyle` in the build settings (`project.pbxproj`). Otherwise ask, or
+  take the screen's background. Text with no color set follows it: white on a dark screen. Every
+  system color then takes that scheme's value (the table below).
 - A default with `\n` in it is shown with `white-space:pre-line` and the default text as it is.
 - If the view still reads the old SDK (other keys or IDs), or reads fewer keys than Xee holds,
   take the copy from Xee's defaults and the look from the code, and tell the person which
@@ -268,9 +308,48 @@ classes), take the ones that phone gets.
   silently in the same push.
 - Controls drawn as iOS draws them, never left out. A `Toggle` is a switch at the right end of its
   row, its label on the left (`display:flex; justify-content:space-between`), 51 by 31 with a white
-  knob, green `#34C759` (or the Toggle's `.tint`) with the knob right when on, gray `#E9E9EA` with the knob left when off,
-  as its default says. A selected plan shows the view's selected border or checkmark. If a row is
+  knob, green `#34C759` (or the Toggle's `.tint`) with the knob right when on, gray with the knob
+  left when off (`#E9E9EA` light, `#39393D` dark), as its default says. A selected plan shows the view's selected border or checkmark. If a row is
   tight, the label wraps; the control keeps its size.
+
+**Lay it out the way SwiftUI does.** Small differences add up over a screen and push the last
+rows off it:
+
+- Line height: iOS takes it from the font file's own metrics. Apple's fonts (SF, SF Rounded, New
+  York, drawn here with Inter, Nunito or Source Serif) set about 1.2 times the size, not the
+  stand-in's CSS `normal`: put `line-height:1.2` on text in any Apple font. A custom font linked
+  from Google Fonts is the same file iOS uses, so its CSS `normal` already matches: leave
+  `line-height:normal` there. A stand-in for a custom font that is not on Google Fonts takes
+  `line-height:1.2`. `.lineSpacing(n)` adds `n` px
+  between lines: `calc(1.2em + 3px)` (or `normal` plus 3 px) on text that wraps, nothing on one line.
+- A `VStack` or `HStack` with no `spacing:` puts about 8 between its children, and none between
+  two `Text`s joined with `+`. Copy every `spacing:` and `.padding` as `gap`, `padding` and `margin`.
+- An SF Symbol (`Image(systemName:)`) is an inline SVG of that symbol's shape (`checkmark`,
+  `xmark.circle.fill`, `star.fill`), sized to its `.font` size and weight and colored as the view
+  colors it, never a text character such as `✓` or `★`. Draw the symbol's outline from memory as
+  closely as you can; its size, weight, color and place matter more than exact curves. The inner
+  mark of a `.fill` symbol (`checkmark.circle.fill`) is cut out with an SVG mask, so what is behind
+  shows through. Emoji in a `Text` stay emoji characters.
+- A Lottie or other animation is drawn as a still: an inline SVG of the first frame where its
+  layers are visible (many fade in from opacity 0, so skip ahead to the settled frame), sketched
+  from the JSON's layer shapes and fill colors at the view's frame size; say it is a sketch.
+- Modifiers on a container reach children that set nothing themselves: `(Text + Text).font(16)`
+  sizes only the parts with no `.font` of their own, and `.foregroundStyle` on a stack also
+  colors the `Link`s in it (no blue link tint).
+- `.shadow(color:radius:x:y:)` is `box-shadow:Xpx Ypx (2 × radius)px color`: CSS blur is about
+  twice SwiftUI's radius. On a shape that is not a box (an icon, text) it is
+  `filter:drop-shadow(Xpx Ypx (radius)px color)`, whose blur is already SwiftUI's radius.
+- `Color(red:green:blue:opacity:)` is `rgb(r×255 g×255 b×255 / opacity)` with the products kept
+  as they are, not rounded to a hex.
+- A `ProgressView()` is the iOS spinner: 8 rounded spokes in a 20 px circle (`.controlSize(.large)`
+  37 px, times any `.scaleEffect`), the spokes fading from the tint (gray `#8E8E93` by default)
+  as an inline SVG, still.
+- iOS 26 `.glassEffect()` and materials (`.ultraThinMaterial`) are a translucent fill over what is
+  behind: `background:rgba(255,255,255,.15);backdrop-filter:blur(20px)` (dark tint on a light
+  screen), keeping the shape and the tint the code gives.
+- A border from `.overlay(RoundedRectangle(...).stroke(color, lineWidth: w))` does not change the
+  view's size: draw it as `box-shadow:inset 0 0 0 Wpx color` (or `outline` with a negative
+  offset), not `border`, which makes the box bigger. Same for `.strokeBorder`.
 
 **Read what the view calls, not only the view.** The look often lives elsewhere; open it before
 writing a style:
@@ -278,9 +357,36 @@ writing a style:
 - A font helper (`.font(size:weight:)`, `.font(style:weight:)`, a `FontModifier`) maps to the
   family and weights the app bundles. A text style is its iOS size at Large: `largeTitle` 34,
   `title` 28, `title2` 22, `title3` 20, `headline` 17, `body` 17, `callout` 16, `subheadline` 15,
-  `footnote` 13, `caption` 12.
+  `footnote` 13, `caption` 12, `caption2` 11; UIKit's `UIFont.TextStyle` names (`.title1` 28,
+  `.caption1` 12) have the same sizes.
+- A system color takes the value for the scheme you draw (light / dark): `.blue` #007AFF/#0A84FF,
+  `.green` #34C759/#30D158, `.orange` #FF9500/#FF9F0A, `.pink` #FF2D55/#FF375F, `.red`
+  #FF3B30/#FF453A, `.yellow` #FFCC00/#FFD60A, `.purple` #AF52DE/#BF5AF2, `.gray` #8E8E93 both,
+  `systemGray2` #AEAEB2/#636366, `systemGray5` #E5E5EA/#2C2C2E, `systemGray6` #F2F2F7/#1C1C1E,
+  `systemBackground` #FFFFFF/#000000, `secondarySystemBackground` #F2F2F7/#1C1C1E. `.primary` is the
+  scheme's text color; `.secondary` under a parent's `.foregroundStyle(c)` is `c` at 60% opacity,
+  and with no parent color it is #3C3C43 at 60% (light) or #EBEBF5 at 60% (dark), as is
+  `secondaryLabel`; `tertiaryLabel` is the same at 30%, `label` is #000/#FFF. A view that sets no
+  background shows `systemBackground`.
+- An image asset (`Image("hero")`) is embedded as a `data:` URI (the dashboard allows no other
+  image source): take the asset's file from its `.imageset` (the dark-appearance file when its
+  `Contents.json` has one and you draw dark), scale it to twice the size it is drawn
+  at, and encode it as JPEG (PNG only when it needs transparency), for example
+  `sips -Z 260 hero.png --out /tmp/hero.jpg -s format jpeg` then base64. A PDF or SVG asset is
+  rasterized the same way (`sips -s format png`). Size it as the view does: `.resizable()` alone
+  stretches to the frame, `.aspectRatio(contentMode: .fill)` or `.scaledToFill()` is
+  `object-fit:cover`, `.fit` is `contain`; a template image (`.renderingMode(.template)`) takes its
+  `foregroundStyle` color. Keep all images together well under the 500 KB limit; if they cannot
+  fit, draw a placeholder of the same size and say so.
 - A named color (`.accent`, `Color("brand")`, `.blue1`) is in the asset catalog: read its
-  `Contents.json` for the hex. Never guess it from a screenshot or a nearby color.
+  `Contents.json` for the hex. Or it is defined in Swift (`static let accent = Color(hex:)`,
+  `Color(light:dark:)`, a `UIColor` extension): take the value for the scheme you draw. Look for a
+  project initializer before the catalog: `Color("EFEADC")` may be a hex string read by a
+  `Color.init(_ hex: String)` extension. A `Color.background` or `.accent` with no Swift
+  definition is the symbol Xcode generates for the colorset of that name in this target's
+  catalog (not another app's in the same workspace). Never guess a color from a screenshot or a nearby color.
+- Draw only what `body` reaches. A computed view or helper defined in the file but never called
+  (an old `header`) is not on screen.
 - A shared component (`MainButton`, a cell, a badge) has its own file: copy its background,
   corner radius, height and font from there. A gradient stays a gradient, a gradient border stays one.
 - Draw the default state's real cells: the trial badge and its "cancel anytime", the per-week line
@@ -290,10 +396,25 @@ writing a style:
 
 - **Find the font the view uses**: `.font(.custom("Roboto-Bold", size:))`, `UIFont(name:)`, a
   font modifier or theme the view calls, the files under `UIAppFonts` in `Info.plist`.
+- **Check that the font ships** before you use it. A name in `UIAppFonts` or the code is not
+  proof: find the `.ttf`/`.otf` file in the project (`find . -iname "*.ttf" -o -iname "*.otf"`)
+  and check that the name the code asks for matches its PostScript, full or family name
+  (`fc-scan --format "%{postscriptname} | %{fullname} | %{family}\n"`); iOS accepts any of them. No file, or a name that differs, and iOS
+  draws the helper's fallback (`UIFont(name:) == nil ? .system(...)`), or the system font if it
+  has none: draw that, and tell the person their custom font is not reaching the app. A fallback
+  keeps only what it states: an italic or a weight that came from the face name
+  (`"InstrumentSerif-Italic"`) is lost, one set by a modifier (`.weight`, `.italic()`) stays.
+- **Variants of the system font**: `.system(design: .serif)` is New York, so use
+  `font-family: ui-serif, "New York", "Source Serif 4", Georgia, serif` with Source Serif 4
+  linked; `.rounded` is `ui-rounded, "SF Pro Rounded", "Nunito", sans-serif` with Nunito linked;
+  `.monospaced` is `ui-monospace, "SF Mono", "Roboto Mono", monospace`. Upright unless the code
+  calls `.italic()`.
 - **On Google Fonts** (Roboto, Inter, Poppins, Montserrat and the like): the same family, with only
   the weights the view uses, as `<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">`
   at the top of `html`. Map the Swift weights (`.regular` 400, `.medium` 500, `.semibold` 600,
-  `.bold` 700, `.heavy` 800, `.black` 900).
+  `.bold` 700, `.heavy` 800, `.black` 900), unless the app's helper picks a face by name: then
+  the face decides (`.heavy` drawn as "Roboto-Black" is 900; `.semibold` drawn as "Archivo-Medium"
+  is 500). `.bold()` on a custom-font `Text` is that family's bold face (700).
 - **Not on Google Fonts**: the closest one by look, and say which you chose.
 - **The system font** (`.system`, no custom font): SF Pro is not on Google Fonts, so use
   `font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif` with Inter linked. It

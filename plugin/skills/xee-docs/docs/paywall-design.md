@@ -20,11 +20,11 @@ Claude reads the paywall view and what it calls, picks the values worth testing,
 
 ## How the preview is drawn
 
-The preview is one iPhone screen, 390 by 844 points, with no scrolling. It shows what most users see: every value at its default, the plan that starts selected, the free-trial toggle as it starts.
+The preview is one iPhone screen, 390 by 844 points. A paywall that scrolls in the app scrolls inside that screen too, with its pinned bar and close button staying put, so every value below the fold still gets its marker. It shows what most users see: every value at its default, the plan that starts selected, the free-trial toggle as it starts.
 
 To match your app, Claude reads the code the view calls, not only the view:
 
-- **Fonts.** The font your view uses, loaded from Google Fonts, in the weights the view uses. For a custom font helper, Claude follows it to the font files your app bundles. If the font is not on Google Fonts, Claude picks the closest one and tells you.
+- **Fonts.** The font your view uses, loaded from Google Fonts, in the weights the view uses. For a custom font helper, Claude follows it to the font files your app bundles, and checks the files are really there: a font named in `Info.plist` but missing from the app is drawn as the system font iOS falls back to, and Claude tells you. If the font is not on Google Fonts, Claude picks the closest one and tells you.
 - **Colors.** Named colors, such as your accent color, come from your asset catalog, not from a guess.
 - **Buttons, cells and badges.** Shared components come from their own files: their background, corners, height and font.
 - **Controls.** A toggle is drawn as an iOS switch, on or off as it starts. The selected plan keeps its border or checkmark.
