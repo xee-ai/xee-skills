@@ -114,8 +114,9 @@ element that shows each variable. Redraw from the code what changed. You may kee
 nothing on screen needs no marker.
 
 Call `push_paywall_version` with `app`, `paywall`, `base_version` (the latest version from
-`get_paywall`), `html`, `products` and `variables` (`key`, `type`, `default`, and `renamed_from`
-where it applies).
+`get_paywall`), `app_build` (chosen as `paywall-tests` A6 says: the newest listed build for a
+values-only change, a new build when keys changed), `html`, `products` and `variables` (`key`,
+`type`, `default`, and `renamed_from` where it applies).
 
 - **Conflict** (`latest is N`): someone pushed since you read. Call `get_paywall` again, compare
   again, and show the person what changed under you before you push again.

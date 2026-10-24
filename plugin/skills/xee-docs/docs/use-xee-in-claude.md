@@ -108,11 +108,11 @@ Say the app and paywall by the IDs you see in the dashboard. A few to start with
 | `list_paywalls` | An app's paywalls, with whether each is live and its latest version. |
 | `get_paywall` | The latest version of a paywall: its variables with their current values, its products, and the test running on it. |
 | `create_paywall` | Creates an empty paywall with the ID the app will ask for and a name for the dashboard. Claude then gives it a first version with `push_paywall_version`. |
-| `push_paywall_version` | Sends a new version after Claude changes the paywall view: an HTML preview with `data-xee` markers, the products and the variables. |
+| `push_paywall_version` | Sends a new version after Claude changes the paywall view: an HTML preview with `data-xee` markers, the products, the variables, and the app build it is for (devices on that build get it). |
 | `list_views` | An app's views (screens or flows without products, such as onboarding), with their latest version. |
 | `get_view` | The latest version of a view: its variables with their current values, its declared events, its screens, and the test running on it. |
 | `create_view` | Creates an empty view with the ID the app will ask for. Claude then gives it a first version with `push_view_version`. |
-| `push_view_version` | Sends a new version after Claude changes a view: an HTML preview with one section per screen, the variables, and the events the code sends. |
+| `push_view_version` | Sends a new version after Claude changes a view: an HTML preview with one section per screen, the variables, the events the code sends, and the app build it is for. |
 | `list_products` | The app's product catalogue, for choosing which products a paywall shows. |
 | `get_product` | One product: what Xee keeps, and its status, US price and display names from App Store Connect. |
 | `create_product` | Adds a product to Xee. It does not create it in App Store Connect; make it there with the same product ID, then sync. |

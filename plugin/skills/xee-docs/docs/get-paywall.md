@@ -107,7 +107,7 @@ if let json = paywall.remoteConfig?.jsonString.data(using: .utf8) {
 The full `PaywallValues` struct, with a SwiftUI and a UIKit version, is in [Let Claude build your paywall](/docs/claude-builds-paywall).
 
 > [!NOTE]
-> A build can ask for the paywall version it was made for. Add `XeePaywalls.json` to the app bundle, mapping each paywall ID to a version number (for example `{ "main": 4 }`), and the SDK sends it with the request. Xee then serves that version's values, so an older build keeps getting values its code understands. A build without the file gets the latest version, and only the latest version gets the running test.
+> Each version is pushed for an app build, and the SDK sends the app's build number (`CFBundleVersion`) with every request. Xee serves the newest version pushed for that build, or for the closest older build, so an older build keeps getting values its code understands, and a change of values only reaches the builds already out at once. Nothing to add to your app: the SDK does it. Only the latest version gets the running test.
 
 ## Get the products
 

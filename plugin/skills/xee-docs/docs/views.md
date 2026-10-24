@@ -65,7 +65,7 @@ The view's code sends events with `Xee.track`, for example when each screen appe
 
 ## Versions
 
-Like a paywall, a view has versions. `XeePaywalls.json` in your app lists the version each build was made for, views and paywalls together: `{ "main": 4, "onboarding": 2 }`. An older build gets its own version's values; the latest version gets the running test. A view and a paywall cannot share an ID.
+Like a paywall, a view has versions, and each is pushed for an app build. The SDK sends the app's build number, and Xee serves the newest version pushed for that build (or the closest older build), so an older build gets values its code reads. The latest version gets the running test. A view and a paywall cannot share an ID.
 
 ## What Claude sends
 

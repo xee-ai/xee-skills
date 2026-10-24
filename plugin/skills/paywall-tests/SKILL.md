@@ -78,6 +78,7 @@ Verify against the live docs; these are the values to expect.
 | `html` | A static preview of the view. Each element that shows a variable carries `data-xee="key"`. A marker with no matching variable refuses the push. A variable with no marker is allowed. |
 | `products` | Store product IDs in order; each must exist in the catalogue (`list_products`). |
 | `base_version` | The version you started from, 0 for a new paywall. If anyone pushed since, the push is refused and nothing is saved. |
+| `app_build` | The app build number (CFBundleVersion) the code ships in. A device sends its build and gets the newest version pushed for that build, or for the closest older build (`get_paywall` → `builds` lists them). A push for the newest listed build must keep every key and type it reads; new, renamed or retyped keys need a higher build. Refused pushes say which. |
 | Refused push | All problems are listed at once; nothing is saved. Fix them all and push again. |
 | Accepted push | Returns a report: `version`, `added`, `unchanged`, `changed`, `removed`, `tests_moved`, `tests_stopped`. Read it back to the user. |
 | Tests | One variable per test, two arms (A is what is served today, B is the new value, 5 to 95% traffic), one running test per paywall. Only builds made for the latest version take part. |
@@ -427,9 +428,21 @@ writing a style:
   font does not load. The dashboard's preview allows only `fonts.googleapis.com` and
   `fonts.gstatic.com`.
 
-Then call `push_paywall_version` with `app`, `paywall`, `base_version`, `html`, `products`, and
-`variables` (`key`, `type`, `default`, plus `renamed_from` where it applies), with the `html`
-built as above.
+Then call `push_paywall_version` with `app`, `paywall`, `base_version`, `app_build`, `html`,
+`products`, and `variables` (`key`, `type`, `default`, plus `renamed_from` where it applies), with
+the `html` built as above.
+
+**`app_build`** is the build the code ships in. Read the project's build number:
+`CURRENT_PROJECT_VERSION` in `project.pbxproj` for the app target (or `CFBundleVersion` in
+`Info.plist`; `$(CURRENT_PROJECT_VERSION)` there means the build setting). Then:
+
+- **Values only** (the same keys and types as the latest version; copy, prices, defaults): use the
+  newest build in `get_paywall`'s `builds`, or the project's build when there are none. Builds
+  already out get the new values at once.
+- **Keys added, renamed or retyped** (the view's code changed): the version needs a build no device
+  runs yet, above the newest in `builds`. If the project's number is not above it, say so and,
+  after a yes, raise `CURRENT_PROJECT_VERSION` by one, then push with the new number. Say that this
+  version reaches users only when that build ships; until then they keep the previous one.
 
 - **Conflict** (`latest is N`): call `get_paywall` again, redo your change on top of the new
   version, and show the person what changed under you before pushing again.

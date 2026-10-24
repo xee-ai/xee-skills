@@ -72,6 +72,7 @@ Verify against the live docs; these are the values to expect.
 | `events` (declared) | 1 to 30 steps in funnel order: `event`, optional `match` (up to 3 properties that narrow it), `label` (1 to 60 characters). No two with the same `event` and `match`. |
 | `products` | None. A push with products is refused. |
 | `base_version` | The version you started from, 0 for a new view. A conflict saves nothing. |
+| `app_build` | The app build the code ships in, as for a paywall (`paywall-tests`, Facts); `get_view` → `builds` lists them. |
 | Accepted push | Returns `version`, `added`, `unchanged`, `changed`, `removed`, `tests_moved`, `tests_stopped`, and `events_added` / `events_removed` when they changed. |
 | Tests | One variable, two arms, one running test per view, judged by its goal. It stops on the same variable changes as a paywall's (`paywall-tests` A5) and also when the new version no longer declares the goal. |
 
@@ -143,8 +144,6 @@ Change nothing before it.
 - Call `await Xee.logShowView(view)` once, when the first screen appears, and `Xee.track` at each
   planned point. Send each event once per time it happens (`.task` or `onAppear` guarded, not in
   `body`).
-- Add the view to `XeePaywalls.json` with the version you will push (`get_view`'s `version` + 1,
-  or 1 for a new view).
 
 Build the app if the project builds from the command line. If you cannot build, say so; do not
 claim it compiles.
@@ -175,7 +174,8 @@ sentence that a push reaches installed builds made for the latest version at onc
 
 ## 4. Push, then tests
 
-Call `push_view_version` with `app`, `view`, `base_version`, `html`, `variables` (`key`, `type`,
+Call `push_view_version` with `app`, `view`, `base_version`, `app_build` (chosen as `paywall-tests`
+A6 says, from `get_view`'s `builds`), `html`, `variables` (`key`, `type`,
 `default`, plus `renamed_from` where it applies) and `events` (`event`, `match` when narrowed,
 `label`, and `goal: true` on the suggested goal, on exactly one event). The goal is saved with the
 view: the dashboard's new-test form and `propose_test` default to it, so the person does not have to
